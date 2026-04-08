@@ -1,7 +1,8 @@
 import { App, Modal } from 'obsidian';
-import type { PillRecord, DailyLogFrontmatter } from '../types';
+import type { PillRecord, DailyLogFrontmatter, PillPattern, Flavor } from '../types';
 import { GRADE_COLORS, FLAVOR_ICONS } from '../constants';
 import type { VaultDataManager } from '../core/vault-data-manager';
+import { analyzeCompatibility, type CompatibilityResult } from '../core/compatibility-engine';
 
 /**
  * FurnaceModal — 开炉展示界面，以仪式感方式展示炼成的丹药。
@@ -84,7 +85,18 @@ export class FurnaceModal extends Modal {
 				const icon = (FLAVOR_ICONS as Record<string, string>)[herb.领域] ?? '🌿';
 				item.setText(`${icon} ${herb.领域} x${herb.数量}`);
 			}
+
+			// 配伍分析
+			this.renderCompatibilityAnalysis(container, this.dailyLog);
 		}
+
+		// 丹纹展示
+		if (pill.丹纹) {
+			this.renderPatternDisplay(container, pill.丹纹, gradeColor);
+		}
+
+		// 丹炉经验获取
+		this.renderXpGain(container, pill);
 
 		// 操作区
 		const actions = container.createDiv({ cls: 'furnace-actions' });
@@ -98,6 +110,90 @@ export class FurnaceModal extends Modal {
 
 	onClose(): void {
 		this.contentEl.empty();
+	}
+
+	private renderCompatibilityAnalysis(container: HTMLElement, dailyLog: DailyLogFrontmatter): void {
+		// Build a simple flavorMap from herbs
+		const flavorMap: Record<string, Flavor> = {};
+		// Use pill data to infer flavors - 君药 and 臣药
+		if (this.pill.主性味 && this.pill.君药领域) {
+			flavorMap[this.pill.君药领域] = this.pill.主性味;
+		}
+		if (this.pill.辅性味 && this.pill.臣药领域) {
+			flavorMap[this.pill.臣药领域] = this.pill.辅性味;
+		}
+
+		const result = analyzeCompatibility(dailyLog.药材, flavorMap);
+
+		if (!result.hasConflict && !result.hasHarmony) return;
+
+		const section = container.createDiv({ cls: 'furnace-compat' });
+		section.style.position = 'relative';
+		section.style.zIndex = '1';
+
+		const title = section.createEl('h4');
+		title.setText('配伍分析');
+
+		if (result.hasHarmony) {
+			const harmonyEl = section.createDiv({ cls: 'compat-harmony' });
+			harmonyEl.setText(`☯ 冲和！${result.harmonyBonus ?? '阴阳调和'} — 品级+${result.gradeBonus}`);
+		}
+
+		if (result.hasConflict && !result.hasHarmony) {
+			for (const pair of result.conflictPairs) {
+				const conflictEl = section.createDiv({ cls: 'compat-conflict' });
+				conflictEl.setText(`⚡ ${pair.a} ↔ ${pair.b} 相冲 — 品级-${result.gradePenalty}`);
+			}
+		}
+	}
+
+	private renderPatternDisplay(container: HTMLElement, pattern: PillPattern, gradeColor: string): void {
+		const section = container.createDiv({ cls: 'furnace-pattern' });
+		section.style.position = 'relative';
+		section.style.zIndex = '1';
+
+		const rarityColors: Record<string, string> = {
+			common: '#2196F3',
+			rare: '#9C27B0',
+			legendary: '#FF9800',
+		};
+		const rarityLabels: Record<string, string> = {
+			common: '普通',
+			rare: '稀有',
+			legendary: '传说',
+		};
+		const color = rarityColors[pattern.rarity] ?? gradeColor;
+
+		const badge = section.createDiv({ cls: `furnace-pattern-badge pattern-${pattern.rarity}` });
+		badge.style.borderColor = color;
+		badge.style.color = color;
+
+		badge.createEl('span', { cls: 'pattern-icon' }).setText('✦');
+		badge.createEl('span', { cls: 'pattern-name' }).setText(pattern.name);
+		badge.createEl('span', { cls: 'pattern-rarity-tag' }).setText(rarityLabels[pattern.rarity] ?? '');
+
+		section.createEl('p', { cls: 'pattern-desc' }).setText(pattern.description);
+		section.createEl('p', { cls: 'pattern-effect' }).setText(`效果：${pattern.effect}`);
+	}
+
+	private renderXpGain(container: HTMLElement, pill: PillRecord): void {
+		const GRADE_XP: Record<string, number> = {
+			'凡品': 0, '灵品': 5, '宝品': 15, '神品': 30,
+		};
+		const herbCount = pill.药材总量;
+		const gradeXp = GRADE_XP[pill.品级] ?? 0;
+		const totalXp = herbCount + gradeXp;
+
+		if (totalXp <= 0) return;
+
+		const section = container.createDiv({ cls: 'furnace-xp-gain' });
+		section.style.position = 'relative';
+		section.style.zIndex = '1';
+
+		section.createEl('span', { cls: 'xp-gain-icon' }).setText('⬆');
+		section.createEl('span', { cls: 'xp-gain-text' }).setText(
+			`丹炉经验 +${totalXp} (药材${herbCount} + 品级${gradeXp})`,
+		);
 	}
 
 	private generateDescription(pill: PillRecord): string {

@@ -4,6 +4,9 @@ import type { PillRecord, Flavor } from '../types';
 import { VaultDataManager } from './vault-data-manager';
 import { DomainTagManager } from './domain-tag-manager';
 import { refinePill } from './refinement-engine';
+import { FurnaceManager } from './furnace-manager';
+import { CultivationManager } from './cultivation/cultivation-manager';
+import { EventBus } from './event-bus';
 
 /**
  * CycleManager — 每日封炉判定与补封逻辑。
@@ -15,6 +18,7 @@ export class CycleManager {
 	private app: App;
 	private vaultDataManager: VaultDataManager;
 	private domainTagManager: DomainTagManager;
+	private furnaceManager: FurnaceManager;
 	private getSealTime: () => string;
 	private setLastSealDate: (date: string) => void;
 	private getLastSealDate: () => string;
@@ -32,6 +36,7 @@ export class CycleManager {
 		this.app = app;
 		this.vaultDataManager = vaultDataManager;
 		this.domainTagManager = domainTagManager;
+		this.furnaceManager = new FurnaceManager(vaultDataManager);
 		this.getSealTime = getSealTime;
 		this.setLastSealDate = setLastSealDate;
 		this.getLastSealDate = getLastSealDate;
@@ -98,11 +103,29 @@ export class CycleManager {
 		// 构建 flavorMap：领域名 → 性味
 		const flavorMap = this.buildFlavorMap();
 
-		// 调用配伍引擎
-		const pill = refinePill(dailyLog.药材, dailyLog.药引, flavorMap);
+		// 获取丹炉状态
+		const furnaceState = await this.furnaceManager.getState();
+
+		// 调用配伍引擎（传入丹炉状态）
+		const pill = refinePill(dailyLog.药材, dailyLog.药引, flavorMap, furnaceState);
 
 		if (pill) {
 			await this.vaultDataManager.setPillData(dateKey, pill);
+
+			// 给丹炉加经验
+			await this.furnaceManager.addXp(pill.药材总量, pill.品级);
+
+			// 给修炼系统加经验
+			try {
+				const cultivationMgr = new CultivationManager(this.vaultDataManager, new EventBus());
+				const sealXp = cultivationMgr.calculateSealXp(pill.药材总量, pill.品级);
+				if (sealXp > 0) {
+					await cultivationMgr.addXp(sealXp, 'seal');
+				}
+			} catch (err) {
+				console.error('丹道：封炉修炼XP增加失败', err);
+			}
+
 			new Notice(`丹道：今日封炉完成，炼成 ${pill.名称}！`);
 		} else {
 			new Notice('丹道：今日封炉完成，但未采集任何药材。');

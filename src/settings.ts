@@ -12,6 +12,10 @@ export interface CauldronSettings {
   showAnimation: boolean;          // 是否播放开炉动画
   showSound: boolean;              // 是否播放开炉音效
   dandaoFolder: string;            // 数据目录名（默认 dandao）
+  seedReminderDays: number;        // 种子过期提醒天数
+  agingExpiryDays: number;         // 药材默认有效期天数
+  breakthroughDifficulty: 'easy' | 'normal' | 'hard';  // 突破难度
+  defaultStatsPeriod: string;      // 默认统计周期
 }
 
 // ============ 运行时状态（存储在 data.json 的 runtime 字段） ============
@@ -35,6 +39,10 @@ export const DEFAULT_SETTINGS: CauldronSettings = {
   showAnimation: true,
   showSound: false,
   dandaoFolder: 'dandao',
+  seedReminderDays: 7,
+  agingExpiryDays: 7,
+  breakthroughDifficulty: 'normal',
+  defaultStatsPeriod: 'week',
 };
 
 export const DEFAULT_RUNTIME: RuntimeState = {
@@ -188,7 +196,62 @@ export class CauldronSettingTab extends PluginSettingTab {
           await this.plugin.savePluginData();
         }));
 
-    // ======== 5. 高级设置 ========
+    // ======== 5. 游戏参数 ========
+    containerEl.createEl('h3', { text: '游戏参数' });
+
+    new Setting(containerEl)
+      .setName('种子过期提醒天数')
+      .setDesc('种子超过此天数未处理时标记为过期（1-30天）')
+      .addSlider(slider => slider
+        .setLimits(1, 30, 1)
+        .setValue(this.plugin.settings.seedReminderDays)
+        .setDynamicTooltip()
+        .onChange(async (value) => {
+          this.plugin.settings.seedReminderDays = value;
+          await this.plugin.savePluginData();
+        }));
+
+    new Setting(containerEl)
+      .setName('药材有效期天数')
+      .setDesc('药材采集后的默认有效期（3-14天）')
+      .addSlider(slider => slider
+        .setLimits(3, 14, 1)
+        .setValue(this.plugin.settings.agingExpiryDays)
+        .setDynamicTooltip()
+        .onChange(async (value) => {
+          this.plugin.settings.agingExpiryDays = value;
+          await this.plugin.savePluginData();
+        }));
+
+    new Setting(containerEl)
+      .setName('突破难度')
+      .setDesc('影响突破成功率和条件要求')
+      .addDropdown(dropdown => dropdown
+        .addOption('easy', '简单')
+        .addOption('normal', '普通')
+        .addOption('hard', '困难')
+        .setValue(this.plugin.settings.breakthroughDifficulty)
+        .onChange(async (value) => {
+          this.plugin.settings.breakthroughDifficulty = value as 'easy' | 'normal' | 'hard';
+          await this.plugin.savePluginData();
+        }));
+
+    new Setting(containerEl)
+      .setName('默认统计周期')
+      .setDesc('打开统计面板时默认展示的时间范围')
+      .addDropdown(dropdown => dropdown
+        .addOption('week', '近一周')
+        .addOption('month', '近一月')
+        .addOption('quarter', '近一季')
+        .addOption('year', '近一年')
+        .addOption('all', '全部')
+        .setValue(this.plugin.settings.defaultStatsPeriod)
+        .onChange(async (value) => {
+          this.plugin.settings.defaultStatsPeriod = value;
+          await this.plugin.savePluginData();
+        }));
+
+    // ======== 6. 高级设置 ========
     containerEl.createEl('h3', { text: '高级设置' });
 
     new Setting(containerEl)

@@ -27,6 +27,13 @@
   --dandao-flavor-bone: #8D6E63;
   --dandao-flavor-agile: #66BB6A;
   --dandao-flavor-fusion: #FFA726;
+
+  /* 境界主题色 */
+  --cult-lianqi: #66BB6A;
+  --cult-zhuji: #42A5F5;
+  --cult-jindan: #FFA726;
+  --cult-yuanying: #9C27B0;
+  --cult-huashen: #FF5722;
 }
 
 /* 暗色模式微调 */
@@ -35,6 +42,13 @@
   --dandao-ink: #e0dcd4;
   --dandao-paper: rgba(255, 255, 255, 0.04);
   --dandao-border: rgba(255, 255, 255, 0.08);
+
+  /* 暗色模式下境界色微调（提亮） */
+  --cult-lianqi: #81C784;
+  --cult-zhuji: #64B5F6;
+  --cult-jindan: #FFB74D;
+  --cult-yuanying: #BA68C8;
+  --cult-huashen: #FF7043;
 }
 
 /* ========================================
@@ -734,7 +748,1910 @@
   }
 }
 
+/* ========================================
+   Tab 导航
+   ======================================== */
+
+.dandao-tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--dandao-border);
+  margin-bottom: var(--dandao-section-gap);
+  padding: 0 12px;
+}
+
+.dandao-tab-item {
+  padding: 8px 16px;
+  font-size: 0.82em;
+  color: var(--dandao-ink);
+  opacity: 0.6;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.dandao-tab-item:hover {
+  opacity: 0.8;
+}
+
+.dandao-tab-item.active {
+  opacity: 1;
+  color: var(--dandao-cinnabar);
+  border-bottom-color: var(--dandao-cinnabar);
+  font-weight: 600;
+}
+
+.dandao-tab-content {
+  animation: dandao-fade-in 0.2s ease;
+}
+
+/* 占位区域样式 */
+.dandao-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  opacity: 0.5;
+  text-align: center;
+}
+
+.dandao-placeholder h4 {
+  margin-bottom: 8px;
+  font-size: 0.9em;
+}
+
+.dandao-placeholder p {
+  font-size: 0.78em;
+  color: var(--dandao-ink);
+  opacity: 0.7;
+}
+
 /* 侧边栏容器内的滚动 */
 .view-content:has(.dandao-container) {
   overflow-y: auto;
+}
+
+/* ========================================
+   外丹深化 — Alchemy Enhancement
+   ======================================== */
+
+/* ---- 陈化状态颜色 ---- */
+
+.herb-aging-fresh  { --aging-color: #66BB6A; }
+.herb-aging-aging  { --aging-color: #FFA726; }
+.herb-aging-mature { --aging-color: #9C27B0; }
+.herb-aging-expired { --aging-color: #9e9e9e; }
+
+.herb-aging-badge {
+  font-size: 0.68em;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--aging-color) 15%, transparent);
+  color: var(--aging-color);
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.herb-aging-expired .herb-domain {
+  opacity: 0.5;
+}
+
+.herb-expiry {
+  font-size: 0.68em;
+  color: var(--text-faint);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ---- 丹纹徽章 ---- */
+
+@keyframes dandao-pattern-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(var(--pattern-glow-rgb, 33,150,243), 0.3); }
+  50%      { box-shadow: 0 0 12px rgba(var(--pattern-glow-rgb, 33,150,243), 0.6); }
+}
+
+.pill-pattern-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1.5px solid;
+  font-size: 0.78em;
+  font-weight: 600;
+  animation: dandao-pattern-glow 2.5s ease-in-out infinite;
+}
+
+.pill-pattern-badge.pattern-common {
+  --pattern-glow-rgb: 33,150,243;
+}
+
+.pill-pattern-badge.pattern-rare {
+  --pattern-glow-rgb: 156,39,176;
+}
+
+.pill-pattern-badge.pattern-legendary {
+  --pattern-glow-rgb: 255,152,0;
+}
+
+.pill-pattern-badge .pattern-name {
+  font-weight: 600;
+}
+
+.pill-pattern-badge .pattern-rarity {
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
+/* ---- 丹炉 Section ---- */
+
+.furnace-card {
+  padding: 12px;
+  border-radius: var(--dandao-radius);
+  background: var(--dandao-paper);
+  border: 1px solid var(--dandao-border);
+}
+
+.furnace-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.furnace-level {
+  font-size: 0.85em;
+  font-weight: 700;
+  color: var(--dandao-cinnabar);
+}
+
+.furnace-title {
+  font-size: 0.88em;
+  font-weight: 600;
+  color: var(--text-normal);
+  letter-spacing: 1px;
+}
+
+.furnace-xp-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--background-secondary);
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.furnace-xp-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--dandao-cinnabar), #FF9800);
+  transition: width 0.4s ease;
+}
+
+.furnace-xp-text {
+  font-size: 0.72em;
+  color: var(--text-muted);
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.furnace-bonuses {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.furnace-bonus-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 4px;
+  border-radius: var(--dandao-radius);
+  background: var(--background-secondary);
+}
+
+.furnace-bonus-label {
+  font-size: 0.68em;
+  color: var(--text-muted);
+}
+
+.furnace-bonus-value {
+  font-size: 0.82em;
+  font-weight: 700;
+  color: var(--text-normal);
+}
+
+.furnace-total {
+  font-size: 0.75em;
+  color: var(--text-faint);
+  text-align: center;
+  padding-top: 4px;
+  border-top: 1px solid var(--dandao-border);
+}
+
+/* ---- 配伍分析（FurnaceModal） ---- */
+
+.furnace-compat {
+  text-align: left;
+  margin-bottom: 12px;
+}
+
+.furnace-compat h4 {
+  font-size: 0.85em;
+  font-weight: 600;
+  margin: 0 0 6px;
+  padding-left: 10px;
+  position: relative;
+}
+
+.furnace-compat h4::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--dandao-cinnabar);
+}
+
+.compat-harmony {
+  padding: 6px 10px;
+  border-radius: var(--dandao-radius);
+  background: rgba(76, 175, 80, 0.1);
+  color: #4CAF50;
+  font-size: 0.82em;
+  font-weight: 500;
+}
+
+.compat-conflict {
+  padding: 6px 10px;
+  border-radius: var(--dandao-radius);
+  background: rgba(244, 67, 54, 0.1);
+  color: #F44336;
+  font-size: 0.82em;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+/* ---- 丹纹展示（FurnaceModal） ---- */
+
+.furnace-pattern {
+  text-align: center;
+  margin-bottom: 12px;
+  padding: 12px 0;
+}
+
+.furnace-pattern-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 2px solid;
+  font-size: 1em;
+  font-weight: 600;
+  animation: dandao-pattern-glow 2.5s ease-in-out infinite;
+}
+
+.furnace-pattern-badge .pattern-icon {
+  font-size: 1.2em;
+}
+
+.furnace-pattern-badge .pattern-rarity-tag {
+  font-size: 0.75em;
+  opacity: 0.8;
+}
+
+.furnace-pattern .pattern-desc {
+  font-size: 0.82em;
+  color: var(--text-muted);
+  margin: 8px 0 2px;
+}
+
+.furnace-pattern .pattern-effect {
+  font-size: 0.78em;
+  color: var(--text-faint);
+  margin: 0;
+}
+
+/* ---- 丹炉经验获取 ---- */
+
+.furnace-xp-gain {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border-radius: var(--dandao-radius);
+  background: rgba(255, 152, 0, 0.08);
+}
+
+.xp-gain-icon {
+  color: #FF9800;
+  font-weight: 700;
+}
+
+.xp-gain-text {
+  font-size: 0.82em;
+  color: #FF9800;
+  font-weight: 500;
+}
+
+/* ---- 周期炉管理弹窗 ---- */
+
+.multi-cycle-title {
+  text-align: center;
+  font-size: 1.1em;
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--dandao-border);
+  position: relative;
+}
+
+.multi-cycle-title::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: var(--dandao-cinnabar);
+  border-radius: 1px;
+}
+
+.multi-cycle-create {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.multi-cycle-create-btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 0.82em;
+  border-radius: var(--dandao-radius);
+  border: 1px dashed var(--dandao-border);
+  background: transparent;
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.multi-cycle-create-btn:hover {
+  border-color: var(--dandao-cinnabar);
+  color: var(--dandao-cinnabar);
+  background: rgba(192, 57, 43, 0.04);
+}
+
+.multi-cycle-list-section h4,
+.multi-cycle-sealed-section h4 {
+  font-size: 0.85em;
+  font-weight: 600;
+  margin: 0 0 8px;
+  padding-left: 10px;
+  position: relative;
+}
+
+.multi-cycle-list-section h4::before,
+.multi-cycle-sealed-section h4::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--dandao-cinnabar);
+}
+
+.multi-cycle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.multi-cycle-card {
+  padding: 10px 12px;
+  border-radius: var(--dandao-radius);
+  background: var(--background-secondary);
+  border: 1px solid var(--dandao-border);
+  transition: all 0.15s ease;
+}
+
+.multi-cycle-card:hover {
+  background: var(--background-secondary-alt);
+}
+
+.multi-cycle-card.cycle-sealed {
+  opacity: 0.6;
+}
+
+.cycle-card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.cycle-type-icon {
+  font-size: 1em;
+}
+
+.cycle-type-label {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.cycle-status-sealed {
+  font-size: 0.68em;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: var(--background-primary);
+  color: var(--text-faint);
+  margin-left: auto;
+}
+
+.cycle-card-info {
+  padding-left: 24px;
+}
+
+.cycle-date {
+  font-size: 0.75em;
+  color: var(--text-muted);
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+}
+
+.cycle-pill-info {
+  font-size: 0.78em;
+  color: var(--text-normal);
+  margin-top: 2px;
+}
+
+.cycle-seal-btn {
+  margin-top: 6px;
+  margin-left: 24px;
+  font-size: 0.75em;
+  padding: 3px 12px;
+  border-radius: var(--dandao-radius);
+  border: 1px solid var(--dandao-cinnabar);
+  background: transparent;
+  color: var(--dandao-cinnabar);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cycle-seal-btn:hover {
+  background: var(--dandao-cinnabar);
+  color: #fff;
+}
+
+/* ========================================
+   统计视图 — Stats Section
+   ======================================== */
+
+.dandao-stats {
+  animation: dandao-fade-in 0.3s ease;
+}
+
+/* ---- 周期选择器 ---- */
+
+.dandao-stats-period-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: var(--dandao-section-gap);
+  padding: 4px;
+  background: var(--dandao-paper);
+  border-radius: var(--dandao-radius);
+  border: 1px solid var(--dandao-border);
+}
+
+.dandao-stats-period-btn {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 0.78em;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: calc(var(--dandao-radius) - 2px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.dandao-stats-period-btn:hover {
+  color: var(--text-normal);
+  background: var(--background-secondary);
+}
+
+.dandao-stats-period-btn.active {
+  color: #fff;
+  background: var(--dandao-cinnabar);
+  border-color: var(--dandao-cinnabar);
+  font-weight: 600;
+}
+
+/* ---- 总览卡片 ---- */
+
+.dandao-stats-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dandao-stats-card {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 8px;
+  border-radius: var(--dandao-radius);
+  background: var(--dandao-paper);
+  border: 1px solid var(--dandao-border);
+  transition: transform 0.15s ease;
+}
+
+.dandao-stats-card:hover {
+  transform: translateY(-1px);
+}
+
+.dandao-stats-card-icon {
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.dandao-stats-card-value {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: var(--text-normal);
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+}
+
+.dandao-stats-card-label {
+  font-size: 0.72em;
+  color: var(--text-muted);
+}
+
+/* ---- 图表容器 ---- */
+
+.dandao-chart-container {
+  margin-top: 8px;
+  border-radius: var(--dandao-radius);
+  overflow: hidden;
+}
+
+/* ---- 统计视图响应式 ---- */
+
+@media (min-width: 360px) {
+  .dandao-stats-cards {
+    flex-wrap: nowrap;
+  }
+
+  .dandao-stats-card {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 300px) {
+  .dandao-stats-period-bar {
+    flex-wrap: wrap;
+  }
+
+  .dandao-stats-period-btn {
+    flex: 1 1 calc(33% - 4px);
+  }
+
+  .dandao-stats-cards {
+    flex-direction: column;
+  }
+
+  .dandao-stats-card {
+    flex: 1 1 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 8px 12px;
+  }
+}
+
+/* ========================================
+   播种层 — Seed Section
+   ======================================== */
+
+/* 快速播种输入区 */
+.seed-quick-input {
+  margin-bottom: var(--dandao-section-gap);
+}
+
+.seed-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.seed-input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: var(--dandao-radius);
+  border: 1px solid var(--dandao-border);
+  background: var(--dandao-paper);
+  color: var(--text-normal);
+  font-size: 0.85em;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.seed-input:focus {
+  border-color: var(--dandao-stone-blue);
+}
+
+.seed-input::placeholder {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.seed-plant-btn {
+  padding: 8px 16px;
+  border-radius: var(--dandao-radius);
+  border: 1px solid var(--dandao-stone-blue);
+  background: var(--dandao-stone-blue);
+  color: #fff;
+  font-size: 0.82em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  letter-spacing: 1px;
+}
+
+.seed-plant-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(33, 150, 243, 0.25);
+}
+
+.seed-plant-btn:active {
+  transform: translateY(0);
+}
+
+/* 种子列表 */
+.seed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 种子卡片 */
+.seed-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--dandao-radius);
+  background: var(--background-secondary);
+  border: 1px solid var(--dandao-border);
+  transition: all 0.15s ease;
+  animation: dandao-fade-in 0.25s ease both;
+}
+
+.seed-card:hover {
+  background: var(--background-secondary-alt);
+  border-color: rgba(33, 150, 243, 0.2);
+}
+
+.seed-card.seed-stale {
+  border-left: 3px solid var(--dandao-cinnabar);
+}
+
+.seed-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.seed-card-text {
+  font-size: 0.85em;
+  color: var(--text-normal);
+  margin: 0 0 4px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.seed-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72em;
+  color: var(--text-faint);
+}
+
+.seed-card-tags {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.seed-stale-badge {
+  color: var(--dandao-cinnabar);
+  font-weight: 600;
+}
+
+.seed-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.seed-action-btn {
+  font-size: 0.75em;
+  padding: 3px 10px;
+  border-radius: var(--dandao-radius);
+  border: 1px solid var(--dandao-border);
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.seed-action-btn:hover {
+  background: var(--background-secondary-alt);
+  color: var(--text-normal);
+}
+
+.seed-convert-btn:hover {
+  border-color: var(--dandao-stone-blue);
+  color: var(--dandao-stone-blue);
+}
+
+.seed-discard-btn:hover {
+  border-color: var(--dandao-cinnabar);
+  color: var(--dandao-cinnabar);
+}
+
+/* 历史折叠区 */
+.seed-history-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.82em;
+  color: var(--text-muted);
+  padding: 6px 0;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.seed-history-toggle:hover {
+  color: var(--text-normal);
+}
+
+.seed-history-arrow {
+  font-size: 0.8em;
+  transition: transform 0.2s ease;
+}
+
+.seed-history-content h6 {
+  font-size: 0.78em;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 8px 0 4px;
+}
+
+.seed-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.seed-history-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--dandao-radius);
+  font-size: 0.78em;
+  color: var(--text-faint);
+}
+
+.seed-history-item.seed-converted {
+  opacity: 0.7;
+}
+
+.seed-history-item.seed-discarded {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.seed-history-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seed-history-path {
+  font-size: 0.9em;
+  color: var(--dandao-stone-blue);
+  flex-shrink: 0;
+}
+
+/* 目标区 */
+.seed-goal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.seed-goal-header h5 {
+  margin: 0;
+}
+
+.seed-goal-add-btn {
+  font-size: 0.75em;
+  padding: 3px 10px;
+  border-radius: var(--dandao-radius);
+  border: 1px dashed var(--dandao-border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.seed-goal-add-btn:hover {
+  border-color: var(--dandao-stone-blue);
+  color: var(--dandao-stone-blue);
+  background: rgba(33, 150, 243, 0.04);
+}
+
+.seed-goal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.seed-goal-card {
+  padding: 10px 12px;
+  border-radius: var(--dandao-radius);
+  background: var(--background-secondary);
+  border: 1px solid var(--dandao-border);
+  transition: all 0.15s ease;
+}
+
+.seed-goal-card:hover {
+  background: var(--background-secondary-alt);
+}
+
+.seed-goal-card.seed-goal-done {
+  opacity: 0.6;
+}
+
+.seed-goal-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.seed-goal-name {
+  font-size: 0.85em;
+  font-weight: 500;
+  color: var(--text-normal);
+}
+
+.seed-goal-progress-text {
+  font-size: 0.75em;
+  color: var(--text-muted);
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+}
+
+/* 目标进度条 */
+.seed-goal-bar-wrapper {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--dandao-border);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.seed-goal-bar {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--dandao-stone-blue);
+  transition: width 0.3s ease;
+  min-width: 0;
+}
+
+.seed-goal-bar.seed-goal-bar-done {
+  background: #66BB6A;
+}
+
+.seed-goal-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+/* 种子弹窗样式 */
+.seed-convert-modal .seed-modal-detail,
+.quick-seed-modal .seed-modal-detail {
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: var(--dandao-radius);
+  background: var(--dandao-paper);
+  border: 1px solid var(--dandao-border);
+}
+
+.seed-modal-text {
+  font-size: 0.9em;
+  margin: 0 0 8px;
+  line-height: 1.6;
+}
+
+.seed-modal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.78em;
+  color: var(--text-faint);
+}
+
+.seed-modal-tags {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.seed-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 12px;
+}
+
+/* 响应式 */
+@media (max-width: 300px) {
+  .seed-input-row {
+    flex-direction: column;
+  }
+
+  .seed-input {
+    width: 100%;
+  }
+
+  .seed-plant-btn {
+    width: 100%;
+  }
+
+  .seed-card {
+    flex-direction: column;
+  }
+
+  .seed-card-actions {
+    flex-direction: row;
+    width: 100%;
+  }
+
+  .seed-goal-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+}
+
+/* ========================================
+   投注系统 — Investment Section
+   ======================================== */
+
+/* ---- 三栏布局 ---- */
+
+.invest-section {
+  animation: dandao-fade-in 0.3s ease;
+}
+
+.invest-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: var(--dandao-section-gap);
+}
+
+@media (max-width: 600px) {
+  .invest-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- 栏头 ---- */
+
+.invest-column {
+  min-width: 0;
+}
+
+.invest-col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.invest-col-header h5 {
+  font-size: 0.88em;
+  font-weight: 600;
+  color: var(--text-normal);
+  margin: 0;
+  padding-left: 10px;
+  position: relative;
+  letter-spacing: 0.5px;
+}
+
+.invest-col-header h5::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--dandao-cinnabar);
+}
+
+.invest-add-btn {
+  font-size: 0.72em;
+  padding: 2px 10px;
+  border-radius: var(--dandao-radius);
+  border: 1px dashed var(--dandao-border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.invest-add-btn:hover {
+  border-color: var(--dandao-cinnabar);
+  color: var(--dandao-cinnabar);
+  background: rgba(192, 57, 43, 0.04);
+}
+
+/* ---- 卡片列表 ---- */
+
+.invest-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.invest-card {
+  padding: 10px;
+  border-radius: var(--dandao-radius);
+  background: var(--dandao-paper);
+  border: 1px solid var(--dandao-border);
+  transition: box-shadow 0.2s ease;
+}
+
+.invest-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.invest-card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.invest-card-name {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--text-normal);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.invest-card-status {
+  font-size: 0.68em;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: var(--background-secondary);
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.invest-card-status.invest-status-active {
+  background: rgba(192, 57, 43, 0.08);
+  color: var(--dandao-cinnabar);
+}
+
+.invest-card-level {
+  font-size: 0.72em;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: rgba(33, 150, 243, 0.1);
+  color: var(--dandao-stone-blue);
+  white-space: nowrap;
+}
+
+.invest-card-desc {
+  font-size: 0.75em;
+  color: var(--text-muted);
+  margin: 0 0 6px;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.invest-card-meta {
+  margin-bottom: 6px;
+}
+
+.invest-meta-text {
+  font-size: 0.72em;
+  color: var(--text-faint);
+}
+
+/* ---- 增益标签 ---- */
+
+.invest-card-boosts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.invest-boost-tag {
+  font-size: 0.7em;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(255, 152, 0, 0.1);
+  color: var(--dandao-grade-divine);
+  white-space: nowrap;
+}
+
+/* ---- XP 进度条 ---- */
+
+.invest-xp-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--background-secondary);
+  margin: 6px 0 4px;
+  overflow: hidden;
+}
+
+.invest-xp-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--dandao-stone-blue);
+  transition: width 0.3s ease;
+}
+
+/* ---- 卡片投注按钮 ---- */
+
+.invest-card-btn {
+  display: block;
+  width: 100%;
+  font-size: 0.78em;
+  padding: 5px 0;
+  border-radius: var(--dandao-radius);
+  border: 1px solid var(--dandao-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.invest-card-btn:hover {
+  background: var(--dandao-cinnabar);
+  color: #fff;
+  border-color: var(--dandao-cinnabar);
+}
+
+.invest-card-btn:active {
+  transform: scale(0.97);
+}
+
+/* ---- 投注历史 ---- */
+
+.invest-history {
+  margin-top: 4px;
+}
+
+.invest-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.invest-history-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: var(--dandao-radius);
+  background: var(--background-secondary);
+  font-size: 0.78em;
+}
+
+.invest-history-icon {
+  flex-shrink: 0;
+}
+
+.invest-history-target {
+  font-weight: 500;
+  color: var(--text-normal);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.invest-history-pill {
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.invest-history-date {
+  flex-shrink: 0;
+  color: var(--text-faint);
+  font-size: 0.88em;
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+}
+
+/* ========================================
+   投注弹窗 — InvestModal
+   ======================================== */
+
+.invest-modal-title {
+  text-align: center;
+  letter-spacing: 1px;
+  margin: 0 0 4px;
+}
+
+.invest-modal-subtitle {
+  text-align: center;
+  font-size: 0.82em;
+  color: var(--text-muted);
+  margin: 0 0 12px;
+}
+
+.invest-empty {
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 0.85em;
+  padding: 24px 12px;
+  font-style: italic;
+}
+
+.invest-pill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 40vh;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+
+.invest-pill-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--dandao-radius);
+  background: var(--background-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 2px solid transparent;
+}
+
+.invest-pill-item:hover {
+  background: var(--background-secondary-alt);
+}
+
+.invest-pill-item.invest-pill-selected {
+  border-color: var(--dandao-cinnabar);
+  background: rgba(192, 57, 43, 0.04);
+}
+
+.invest-pill-grade {
+  font-size: 0.72em;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 10px;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.invest-pill-name {
+  flex: 1;
+  font-size: 0.82em;
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.invest-pill-purity {
+  font-size: 0.75em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+}
+
+/* ---- 效果预览 ---- */
+
+.invest-preview {
+  padding: 10px;
+  border-radius: var(--dandao-radius);
+  background: var(--dandao-paper);
+  border: 1px solid var(--dandao-border);
+  margin-bottom: 12px;
+  transition: opacity 0.2s ease;
+}
+
+.invest-preview-hidden {
+  display: none;
+}
+
+.invest-preview-title {
+  font-size: 0.82em;
+  font-weight: 600;
+  color: var(--text-normal);
+  margin: 0 0 4px;
+}
+
+.invest-preview-text {
+  font-size: 0.82em;
+  color: var(--dandao-cinnabar);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ---- 确认按钮 ---- */
+
+.invest-confirm-btn {
+  display: block;
+  width: 100%;
+  font-size: 0.88em;
+  padding: 8px 0;
+  border-radius: var(--dandao-radius);
+  border: 1px solid var(--dandao-cinnabar);
+  background: var(--dandao-cinnabar);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.invest-confirm-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(192, 57, 43, 0.3);
+}
+
+.invest-confirm-btn.invest-confirm-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ========================================
+   内丹体系 — Cultivation Section
+   ======================================== */
+
+/* 修炼区块 */
+.cult-section {
+  animation: dandao-fade-in 0.35s ease both;
+}
+
+/* ---- 境界大字展示 ---- */
+
+.cult-realm-title {
+  text-align: center;
+  font-size: 1.8em;
+  font-weight: 700;
+  letter-spacing: 4px;
+  padding: 16px 0 8px;
+  line-height: 1.3;
+}
+
+/* ---- XP 进度条 ---- */
+
+.cult-xp-wrap {
+  margin-bottom: 14px;
+}
+
+.cult-xp-track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--background-secondary);
+  overflow: hidden;
+}
+
+.cult-xp-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.cult-xp-label {
+  text-align: center;
+  font-size: 0.72em;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ---- 境界信息卡 ---- */
+
+.cult-info-card {
+  background: var(--dandao-paper);
+  border: 1px solid var(--dandao-border);
+  border-radius: var(--dandao-radius);
+  padding: 10px 12px;
+  margin-bottom: var(--dandao-section-gap);
+}
+
+.cult-info-stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+}
+
+.cult-info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.cult-info-label {
+  font-size: 0.7em;
+  color: var(--text-muted);
+}
+
+.cult-info-value {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.cult-features {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--dandao-border);
+}
+
+.cult-features-title {
+  font-size: 0.72em;
+  color: var(--text-muted);
+  margin-right: 6px;
+}
+
+.cult-features-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+/* ---- 经脉网格 ---- */
+
+.cult-meridian-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.cult-meridian-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--dandao-radius);
+  background: var(--background-secondary);
+  transition: background 0.15s ease;
+}
+
+.cult-meridian-card:hover {
+  background: var(--background-secondary-alt);
+}
+
+.cult-meridian-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--dandao-cinnabar);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85em;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.cult-meridian-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cult-meridian-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.cult-meridian-domain {
+  font-size: 0.8em;
+  font-weight: 500;
+  color: var(--text-normal);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cult-meridian-level-name {
+  font-size: 0.7em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.cult-meridian-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--background-primary);
+  margin: 4px 0 2px;
+  overflow: hidden;
+}
+
+.cult-meridian-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--dandao-cinnabar);
+  transition: width 0.4s ease;
+}
+
+.cult-meridian-bonus {
+  font-size: 0.68em;
+  color: var(--text-faint);
+}
+
+/* ---- 突破区 ---- */
+
+.cult-breakthrough {
+  margin-top: var(--dandao-section-gap);
+  padding-top: var(--dandao-section-gap);
+  border-top: 1px solid var(--dandao-border);
+}
+
+.cult-cond-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.cult-cond-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--dandao-radius);
+  font-size: 0.8em;
+}
+
+.cult-cond-row.met { background: rgba(102, 187, 106, 0.08); }
+.cult-cond-row.unmet { background: rgba(244, 67, 54, 0.06); }
+
+.cult-cond-icon {
+  font-weight: 700;
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+}
+
+.cult-cond-row.met .cult-cond-icon { color: #66BB6A; }
+.cult-cond-row.unmet .cult-cond-icon { color: #F44336; }
+
+.cult-cond-desc {
+  flex: 1;
+  color: var(--text-normal);
+}
+
+.cult-cond-progress {
+  font-size: 0.9em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+}
+
+.cult-breakthrough-btn-wrap {
+  text-align: center;
+}
+
+.cult-breakthrough-btn {
+  font-size: 0.9em;
+  font-weight: 600;
+  padding: 8px 28px;
+  border-radius: var(--dandao-radius);
+  border: 1px solid var(--dandao-cinnabar);
+  background: var(--dandao-cinnabar);
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: all 0.2s ease;
+  animation: cult-pulse 2s ease-in-out infinite;
+}
+
+.cult-breakthrough-btn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(192, 57, 43, 0.35);
+}
+
+.cult-breakthrough-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  animation: none;
+}
+
+@keyframes cult-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(192, 57, 43, 0); }
+}
+
+/* ========================================
+   突破模态框 — Breakthrough Modal
+   ======================================== */
+
+.bt-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.bt-header {
+  font-size: 1.5em;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
+.bt-realm-from,
+.bt-realm-to {
+  font-weight: 700;
+}
+
+.bt-arrow {
+  margin: 0 12px;
+  color: var(--text-muted);
+  font-size: 0.8em;
+}
+
+.bt-conditions {
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.bt-conditions h4 {
+  font-size: 0.88em;
+  font-weight: 600;
+  margin: 0 0 8px;
+  padding-left: 10px;
+  position: relative;
+}
+
+.bt-conditions h4::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--dandao-cinnabar);
+}
+
+.bt-cond-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: var(--dandao-radius);
+  font-size: 0.82em;
+  margin-bottom: 3px;
+}
+
+.bt-cond-row.met { background: rgba(102, 187, 106, 0.08); }
+.bt-cond-row.unmet { background: rgba(244, 67, 54, 0.06); }
+
+.bt-cond-icon {
+  font-weight: 700;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.bt-cond-row.met .bt-cond-icon { color: #66BB6A; }
+.bt-cond-row.unmet .bt-cond-icon { color: #F44336; }
+
+.bt-cond-desc {
+  flex: 1;
+  color: var(--text-normal);
+}
+
+.bt-cond-val {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+}
+
+.bt-actions {
+  margin: 16px 0;
+}
+
+.bt-attempt-btn {
+  font-size: 1em;
+  font-weight: 600;
+  padding: 10px 36px;
+  border-radius: var(--dandao-radius);
+  border: 1px solid var(--dandao-cinnabar);
+  background: var(--dandao-cinnabar);
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: all 0.2s ease;
+  animation: cult-pulse 2s ease-in-out infinite;
+}
+
+.bt-attempt-btn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(192, 57, 43, 0.35);
+}
+
+.bt-attempt-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  animation: none;
+}
+
+/* ---- 突破结果 ---- */
+
+.bt-result {
+  padding-top: 16px;
+  animation: dandao-fade-in 0.4s ease;
+}
+
+.bt-result-title {
+  font-size: 1.3em;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+
+.bt-result-title.success { color: #FFA726; }
+.bt-result-title.failure { color: #F44336; }
+
+.bt-new-realm {
+  font-size: 2em;
+  font-weight: 700;
+  letter-spacing: 4px;
+  margin: 12px 0;
+}
+
+.bt-unlocks {
+  margin: 12px 0;
+}
+
+.bt-unlocks-label {
+  font-size: 0.78em;
+  color: var(--text-muted);
+}
+
+.bt-unlocks-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.bt-result-msg {
+  font-size: 0.88em;
+  color: var(--text-muted);
+  margin: 10px 0;
+}
+
+.bt-encourage {
+  font-size: 0.82em;
+  color: var(--text-faint);
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.bt-close-btn {
+  font-size: 0.88em;
+  padding: 8px 28px;
+  border-radius: var(--dandao-radius);
+  border: 1px solid var(--dandao-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.15s ease;
+}
+
+.bt-close-btn:hover {
+  border-color: var(--dandao-cinnabar);
+  color: var(--dandao-cinnabar);
+}
+
+/* 突破成功光晕动画 */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 167, 38, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(255, 167, 38, 0.5); }
+}
+
+.bt-success {
+  animation: glow-pulse 1.5s ease-in-out 3;
+}
+
+/* 突破失败晃动动画 */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-6px); }
+  30% { transform: translateX(5px); }
+  45% { transform: translateX(-4px); }
+  60% { transform: translateX(3px); }
+  75% { transform: translateX(-2px); }
+}
+
+.bt-failure {
+  animation: shake 0.5s ease;
+}
+
+/* ---- 窄面板适配 ---- */
+
+@media (max-width: 300px) {
+  .cult-meridian-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cult-realm-title {
+    font-size: 1.4em;
+    letter-spacing: 2px;
+  }
+
+  .bt-header {
+    font-size: 1.2em;
+  }
 }
