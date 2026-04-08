@@ -1,5 +1,5 @@
 import type { Goal } from '../types';
-import type { VaultDataManager } from './vault-data-manager';
+import type { VaultDataManager } from './vault/vault-data-manager';
 import type { EventBus } from './event-bus';
 
 /**
@@ -17,23 +17,22 @@ export class GoalManager {
 
 	/** 创建新目标 */
 	async createGoal(name: string, targetValue: number, unit: string, projectId?: string): Promise<Goal> {
-		const goal: Goal = {
-			id: `goal-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-			name: name.trim(),
-			projectId,
-			targetValue,
-			currentValue: 0,
-			unit,
-		};
-
 		try {
-			await this.vaultDataManager.saveGoal(goal);
+			const file = await this.vaultDataManager.addGoal({
+				name: name.trim(),
+				projectId,
+				targetValue,
+				currentValue: 0,
+				unit,
+			});
+			const goals = await this.vaultDataManager.getGoals();
+			const goal = goals.find(g => g.file.path === file.path);
+			if (!goal) throw new Error('创建目标后未找到');
+			return goal;
 		} catch (err) {
 			console.error('[GoalManager] 创建目标失败:', err);
 			throw err;
 		}
-
-		return goal;
 	}
 
 	/** 更新目标进度 */
@@ -46,12 +45,7 @@ export class GoalManager {
 				return;
 			}
 
-			const updated: Goal = {
-				...goal,
-				currentValue: goal.currentValue + delta,
-			};
-
-			await this.vaultDataManager.saveGoal(updated);
+			await this.vaultDataManager.updateGoal(goal.file, { currentValue: goal.currentValue + delta });
 		} catch (err) {
 			console.error('[GoalManager] 更新目标进度失败:', err);
 			throw err;
@@ -83,7 +77,10 @@ export class GoalManager {
 	/** 删除目标 */
 	async removeGoal(goalId: string): Promise<void> {
 		try {
-			await this.vaultDataManager.removeGoal(goalId);
+			const goals = await this.vaultDataManager.getGoals();
+			const goal = goals.find(g => g.id === goalId);
+			if (!goal) return;
+			await this.vaultDataManager.removeGoal(goal.file);
 		} catch (err) {
 			console.error('[GoalManager] 删除目标失败:', err);
 			throw err;

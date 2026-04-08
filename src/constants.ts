@@ -49,27 +49,12 @@ export const DEFAULT_DOMAIN_TAGS = [
   { name: '社交', flavor: '融合' as Flavor, color: '#d4a017' },
 ];
 
-// 丹道数据目录默认名
-export const DEFAULT_DANDAO_FOLDER = 'dandao';
-export const LOG_SUBFOLDER = '日志';
-export const DOMAIN_CONFIG_FILENAME = '领域配置.md';
-
-// 投注系统文件路径
-export const INVESTMENT_SUBFOLDER = '投注';
-export const PROJECTS_FILENAME = '项目.md';
-export const TEMPLATES_FILENAME = '模板.md';
-export const CHARACTERS_FILENAME = '角色.md';
-export const INVESTMENT_RECORDS_FILENAME = '投注记录.md';
-
-// 播种层文件路径
-export const SEEDS_FILENAME = '种子池.md';
-export const GOALS_FILENAME = '目标.md';
-
-// 修炼系统文件路径
-export const CULTIVATION_FILENAME = '修炼档案.md';
-
-// 多周期丹炉目录
-export const MULTI_CYCLE_SUBFOLDER = '周期炉';
+// 默认标签常量
+export const DEFAULT_DOMAIN_TAG = 'cauldron/domain';
+export const DEFAULT_SEED_TAG = 'cauldron/seed';
+export const DEFAULT_PROJECT_TAG = 'cauldron/project';
+export const DEFAULT_GOAL_TAG = 'cauldron/goal';
+export const DEFAULT_EXCLUDE_TAG = 'cauldron/archive';
 
 // 侧边栏视图类型
 export const CAULDRON_VIEW_TYPE = 'dandao-cauldron-view';
@@ -87,7 +72,7 @@ export const REALM_THRESHOLDS: Record<CultivationRealm, number[]> = {
 // 各境界解锁的功能
 export const REALM_UNLOCKS: Record<CultivationRealm, string[]> = {
   '练气': ['日炉'],
-  '筑基': ['周炉', '投注系统'],
+  '筑基': ['周炉', '目标系统'],
   '金丹': ['自定义丹纹', '月炉'],
   '元婴': ['项目炉', '高级配伍'],
   '化神': ['全部功能'],
@@ -132,7 +117,7 @@ export const FURNACE_LEVEL_TABLE: Array<{ level: number; xpRequired: number; gra
 
 // ============ 丹纹候选池 ============
 export const PATTERN_POOL: PillPattern[] = [
-  { name: '灵光纹', description: '丹药表面浮现灵光', effect: '投注效果+20%', rarity: 'common' },
+  { name: '灵光纹', description: '丹药表面浮现灵光', effect: '目标进度+20%', rarity: 'common' },
   { name: '天机纹', description: '隐含天地运转之理', effect: '修炼经验+30%', rarity: 'common' },
   { name: '混元纹', description: '融合多元之力', effect: '多领域经脉同时获得进度', rarity: 'rare' },
   { name: '破境纹', description: '蕴含突破之力', effect: '心境值+5', rarity: 'rare' },
@@ -185,38 +170,6 @@ export const BREAKTHROUGH_CONDITIONS: Record<CultivationRealm, Array<{ type: str
     { type: 'furnace_level', description: '丹炉等级', required: 7 },
   ],
 };
-
-// ============ 角色升级经验表 ============
-export const CHARACTER_LEVEL_TABLE: Array<{ level: number; xpRequired: number }> = [
-  { level: 1, xpRequired: 0 },
-  { level: 2, xpRequired: 50 },
-  { level: 3, xpRequired: 150 },
-  { level: 4, xpRequired: 300 },
-  { level: 5, xpRequired: 500 },
-  { level: 6, xpRequired: 800 },
-  { level: 7, xpRequired: 1200 },
-  { level: 8, xpRequired: 1800 },
-  { level: 9, xpRequired: 2500 },
-  { level: 10, xpRequired: 3500 },
-];
-
-// ============ 投注效果定义 ============
-export const INVESTMENT_EFFECTS = {
-  project: {
-    // 丹药品级 → 增益持续天数
-    durationByGrade: { '凡品': 1, '灵品': 3, '宝品': 5, '神品': 7 } as Record<Grade, number>,
-    // 增益效果：稀有度提升1级
-    effect: 'rarity+1',
-  },
-  template: {
-    // 每次投注提升的守时引效果倍增系数
-    catalystMultiplierPerLevel: 0.1,
-  },
-  character: {
-    // 品级 → XP 权重
-    xpWeightByGrade: { '凡品': 10, '灵品': 25, '宝品': 50, '神品': 100 } as Record<Grade, number>,
-  },
-} as const;
 
 // ============ 统计周期配置 ============
 export const STATS_PERIODS: Array<{ value: StatsPeriod; label: string; days: number }> = [

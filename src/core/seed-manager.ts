@@ -1,5 +1,5 @@
 import type { Seed } from '../types';
-import type { VaultDataManager } from './vault-data-manager';
+import type { VaultDataManager } from './vault/vault-data-manager';
 import type { EventBus } from './event-bus';
 
 /**
@@ -17,23 +17,19 @@ export class SeedManager {
 
 	/** 创建新种子 */
 	async createSeed(text: string, tags?: string[]): Promise<Seed> {
-		const seed: Seed = {
-			id: `seed-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-			text: text.trim(),
-			createdDate: new Date().toISOString().slice(0, 10),
-			status: 'pending',
-			tags: tags && tags.length > 0 ? tags : undefined,
-		};
-
 		try {
-			await this.vaultDataManager.addSeed(seed);
-			this.eventBus?.emit('seed-created', { seed });
+			await this.vaultDataManager.addSeed(text.trim(), tags);
+			const seeds = await this.vaultDataManager.getSeeds();
+			const seed = seeds.find(s => s.text === text.trim());
+			if (seed) {
+				this.eventBus?.emit('seed-created', { seed });
+				return seed;
+			}
+			throw new Error('创建种子后未找到');
 		} catch (err) {
 			console.error('[SeedManager] 创建种子失败:', err);
 			throw err;
 		}
-
-		return seed;
 	}
 
 	/** 将种子转化为任务 */
@@ -46,13 +42,8 @@ export class SeedManager {
 				return;
 			}
 
-			const updated: Seed = {
-				...seed,
-				status: 'converted',
-				convertedTaskPath: taskPath,
-			};
-
-			await this.vaultDataManager.updateSeed(updated);
+			await this.vaultDataManager.updateSeed(seed.file, { status: 'converted', convertedTaskPath: taskPath });
+			const updated: Seed = { ...seed, status: 'converted', convertedTaskPath: taskPath };
 			this.eventBus?.emit('seed-converted', { seed: updated, taskPath });
 		} catch (err) {
 			console.error('[SeedManager] 转化种子失败:', err);
@@ -67,12 +58,7 @@ export class SeedManager {
 			const seed = seeds.find(s => s.id === seedId);
 			if (!seed) return;
 
-			const updated: Seed = {
-				...seed,
-				status: 'discarded',
-			};
-
-			await this.vaultDataManager.updateSeed(updated);
+			await this.vaultDataManager.updateSeed(seed.file, { status: 'discarded' });
 		} catch (err) {
 			console.error('[SeedManager] 丢弃种子失败:', err);
 			throw err;

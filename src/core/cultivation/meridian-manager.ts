@@ -1,13 +1,17 @@
 import type { MeridianState, DomainTag } from '../../types';
-import { VaultDataManager } from '../vault/vault-data-manager';
+import type CauldronPlugin from '../../main';
 import { MERIDIAN_LEVEL_TABLE } from '../../constants';
 
 export class MeridianManager {
-	constructor(private vaultDataManager: VaultDataManager) {}
+	private plugin: CauldronPlugin;
+
+	constructor(plugin: CauldronPlugin) {
+		this.plugin = plugin;
+	}
 
 	/** 获取所有经脉状态 */
 	async getAllStates(): Promise<MeridianState[]> {
-		return this.vaultDataManager.getMeridianStates();
+		return this.plugin.data.meridianStates ?? [];
 	}
 
 	/** 获取特定领域的经脉状态 */
@@ -26,7 +30,15 @@ export class MeridianManager {
 		state.level = calc.level;
 		state.progress = calc.progress;
 
-		await this.vaultDataManager.saveMeridianState(state);
+		const states = this.plugin.data.meridianStates ?? [];
+		const idx = states.findIndex((s: MeridianState) => s.domainTag === state.domainTag);
+		if (idx >= 0) {
+			states[idx] = state;
+		} else {
+			states.push(state);
+		}
+		this.plugin.data.meridianStates = states;
+		await this.plugin.savePluginData();
 		return state;
 	}
 
@@ -82,11 +94,18 @@ export class MeridianManager {
 	async initializeMeridians(domainTags: DomainTag[]): Promise<void> {
 		const existing = await this.getAllStates();
 		const existingTags = new Set(existing.map(m => m.domainTag));
+		let changed = false;
 
 		for (const tag of domainTags) {
 			if (!existingTags.has(tag.name)) {
-				await this.vaultDataManager.saveMeridianState(this.getDefaultState(tag.name));
+				existing.push(this.getDefaultState(tag.name));
+				changed = true;
 			}
+		}
+
+		if (changed) {
+			this.plugin.data.meridianStates = existing;
+			await this.plugin.savePluginData();
 		}
 	}
 }

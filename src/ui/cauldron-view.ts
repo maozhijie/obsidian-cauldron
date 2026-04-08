@@ -1,9 +1,10 @@
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { CAULDRON_VIEW_TYPE } from '../constants';
-import type { VaultDataManager } from '../core/vault-data-manager';
+import type { VaultDataManager } from '../core/vault/vault-data-manager';
 import type { PomodoroTimer } from '../pomodoro/pomodoro-timer';
 import type { DomainTagManager } from '../core/domain-tag-manager';
 import type { SectionContext } from './components/section-base';
+import type CauldronPlugin from '../main';
 import { renderTabBar, type TabDefinition } from './components/tab-bar';
 import { StatusBarSection } from './components/status-bar';
 import { HerbSection } from './components/herb-section';
@@ -11,14 +12,12 @@ import { CatalystSection } from './components/catalyst-section';
 import { PomodoroSection, updatePomodoroDisplay } from './components/pomodoro-section';
 import { PillSection } from './components/pill-section';
 import { FurnaceSection } from './components/furnace-section';
-import { InvestmentSection } from './components/investment-section';
 import { SeedSection } from './components/seed-section';
 import { CultivationSection } from './components/cultivation-section';
 import { StatsSection } from './components/stats-section';
 
 const TABS: TabDefinition[] = [
 	{ id: 'alchemy', label: '炼丹' },
-	{ id: 'investment', label: '投注' },
 	{ id: 'seeds', label: '种子' },
 	{ id: 'cultivation', label: '修炼' },
 	{ id: 'stats', label: '统计' },
@@ -33,7 +32,6 @@ const furnaceSection = new FurnaceSection();
 const pillSection = new PillSection();
 
 // 其他 Tab 子组件
-const investmentSection = new InvestmentSection();
 const seedSection = new SeedSection();
 const cultivationSection = new CultivationSection();
 const statsSection = new StatsSection();
@@ -49,6 +47,7 @@ export class CauldronView extends ItemView {
 	vaultDataManager?: VaultDataManager;
 	pomodoroTimer?: PomodoroTimer;
 	domainTagManager?: DomainTagManager;
+	plugin?: CauldronPlugin;
 	sealTime = '23:00';
 
 	private activeTab = 'alchemy';
@@ -166,15 +165,13 @@ export class CauldronView extends ItemView {
 				vaultDataManager: this.vaultDataManager,
 				pomodoroTimer: this.pomodoroTimer,
 				domainTagManager: this.domainTagManager,
+				plugin: this.plugin,
 				sealTime: this.sealTime,
 			};
 
 			switch (this.activeTab) {
 				case 'alchemy':
 					await this.renderAlchemyTab(ctx);
-					break;
-				case 'investment':
-					await investmentSection.render(ctx);
 					break;
 				case 'seeds':
 					await seedSection.render(ctx);

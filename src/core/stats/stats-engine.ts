@@ -8,7 +8,6 @@ import type {
 	DomainTag,
 	MeridianState,
 	DailyLogFrontmatter,
-	InvestmentRecord,
 } from '../../types';
 import { STATS_PERIODS, GRADES } from '../../constants';
 
@@ -54,7 +53,6 @@ export async function generateSnapshot(
 		const { startDate, endDate } = computeDateRange(period, allDateKeys);
 
 		const logs = await vdm.getAllDailyLogs(startDate, endDate);
-		const investmentRecords = await vdm.getInvestmentRecords();
 
 		// 聚合
 		let totalHerbs = 0;
@@ -136,14 +134,6 @@ export async function generateSnapshot(
 		const endD = new Date(endDate);
 		const totalDays = Math.max(1, Math.floor((endD.getTime() - startD.getTime()) / 86400000) + 1);
 
-		// 投注统计
-		const investmentsByType: Record<string, number> = {};
-		for (const record of investmentRecords) {
-			if (record.investDate >= startDate && record.investDate <= endDate) {
-				investmentsByType[record.type] = (investmentsByType[record.type] || 0) + 1;
-			}
-		}
-
 		// dailyActivity
 		const dailyActivity = buildDailyActivity(startDate, endDate, dailyMap);
 
@@ -166,7 +156,7 @@ export async function generateSnapshot(
 			pomodoroCompleted,
 			pomodoroInterrupted,
 			totalFocusMinutes,
-			investmentsByType,
+			investmentsByType: {},
 			dailyActivity,
 		};
 	} catch (e) {

@@ -1,12 +1,13 @@
 import { Notice } from 'obsidian';
 import type { App } from 'obsidian';
 import type { PillRecord, Flavor } from '../types';
-import { VaultDataManager } from './vault-data-manager';
+import { VaultDataManager } from './vault/vault-data-manager';
 import { DomainTagManager } from './domain-tag-manager';
 import { refinePill } from './refinement-engine';
 import { FurnaceManager } from './furnace-manager';
 import { CultivationManager } from './cultivation/cultivation-manager';
 import { EventBus } from './event-bus';
+import type CauldronPlugin from '../main';
 
 /**
  * CycleManager — 每日封炉判定与补封逻辑。
@@ -16,6 +17,7 @@ import { EventBus } from './event-bus';
  */
 export class CycleManager {
 	private app: App;
+	private plugin: CauldronPlugin;
 	private vaultDataManager: VaultDataManager;
 	private domainTagManager: DomainTagManager;
 	private furnaceManager: FurnaceManager;
@@ -26,6 +28,7 @@ export class CycleManager {
 
 	constructor(
 		app: App,
+		plugin: CauldronPlugin,
 		vaultDataManager: VaultDataManager,
 		domainTagManager: DomainTagManager,
 		getSealTime: () => string,
@@ -34,9 +37,10 @@ export class CycleManager {
 		onPillCreated?: (dateKey: string, pill: PillRecord) => void,
 	) {
 		this.app = app;
+		this.plugin = plugin;
 		this.vaultDataManager = vaultDataManager;
 		this.domainTagManager = domainTagManager;
-		this.furnaceManager = new FurnaceManager(vaultDataManager);
+		this.furnaceManager = new FurnaceManager(plugin);
 		this.getSealTime = getSealTime;
 		this.setLastSealDate = setLastSealDate;
 		this.getLastSealDate = getLastSealDate;
@@ -117,7 +121,7 @@ export class CycleManager {
 
 			// 给修炼系统加经验
 			try {
-				const cultivationMgr = new CultivationManager(this.vaultDataManager, new EventBus());
+				const cultivationMgr = new CultivationManager(this.plugin, new EventBus());
 				const sealXp = cultivationMgr.calculateSealXp(pill.药材总量, pill.品级);
 				if (sealXp > 0) {
 					await cultivationMgr.addXp(sealXp, 'seal');

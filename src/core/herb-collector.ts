@@ -1,6 +1,6 @@
 import { App, TFile } from 'obsidian';
 import type { HerbRecord, CatalystRecord, Rarity } from '../types';
-import { VaultDataManager } from './vault-data-manager';
+import { VaultDataManager } from './vault/vault-data-manager';
 import { DomainTagManager } from './domain-tag-manager';
 import { CatalystCollector } from './catalyst-collector';
 import { parseAllTasks, detectNewCompletions, hashTaskLine } from './task-parser';
@@ -47,9 +47,9 @@ export class HerbCollector {
 		const cache = this.getTaskStateCache();
 		const files = this.app.vault.getMarkdownFiles();
 
-		// 只处理非 .dandao/ 目录下的文件，限制最多处理 500 个文件
+		// 只处理非日记文件，限制最多处理 500 个文件
 		const targetFiles = files
-			.filter(f => !this.isDandaoPath(f.path))
+			.filter(f => !this.isDailyNotePath(f.path))
 			.sort((a, b) => b.stat.mtime - a.stat.mtime)
 			.slice(0, 500);
 
@@ -83,8 +83,8 @@ export class HerbCollector {
 		// 忽略非 .md 文件
 		if (file.extension !== 'md') return false;
 
-		// 忽略 dandao/ 目录下的文件（避免自写日志触发循环）
-		if (this.isDandaoPath(file.path)) return false;
+		// 忽略日记文件（避免自写日志触发循环）
+		if (this.isDailyNotePath(file.path)) return false;
 
 		const newContent = await this.app.vault.cachedRead(file);
 		const oldContent = this.fileContentCache.get(file.path);
@@ -186,12 +186,11 @@ export class HerbCollector {
 		};
 	}
 
-	/** 判断路径是否在 dandao/ 目录下 */
-	private isDandaoPath(path: string): boolean {
-		const normalized = path.replace(/\\/g, '/').toLowerCase();
-		// 支持用户自定义的目录名（默认 dandao）
-		const folder = this.vaultDataManager.getFolderName().toLowerCase();
-		return normalized.startsWith(folder + '/') || normalized.includes('/' + folder + '/');
+	/** 判断路径是否是日记文件 */
+	private isDailyNotePath(path: string): boolean {
+		// 检查文件名是否符合 YYYY-MM-DD.md 格式
+		const fileName = path.split('/').pop() || '';
+		return /^\d{4}-\d{2}-\d{2}\.md$/.test(fileName);
 	}
 
 	/** 返回当前日期 YYYY-MM-DD */

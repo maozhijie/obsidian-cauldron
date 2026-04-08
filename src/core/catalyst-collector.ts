@@ -1,5 +1,5 @@
 import type { CatalystRecord, CatalystType } from '../types';
-import { VaultDataManager } from './vault-data-manager';
+import { VaultDataManager } from './vault/vault-data-manager';
 
 /**
  * CatalystCollector — 药引采集引擎。

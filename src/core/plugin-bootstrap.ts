@@ -1,7 +1,8 @@
 import { TFile, debounce } from 'obsidian';
 import type CauldronPlugin from '../main';
 import { CAULDRON_VIEW_TYPE } from '../constants';
-import { VaultDataManager } from '../core/vault-data-manager';
+import { VaultDataManager } from '../core/vault/vault-data-manager';
+import { TagNoteQuery } from '../core/vault/tag-note-query';
 import { DomainTagManager } from '../core/domain-tag-manager';
 import { CatalystCollector } from '../core/catalyst-collector';
 import { HerbCollector } from '../core/herb-collector';
@@ -20,9 +21,9 @@ import { CultivationManager } from '../core/cultivation/cultivation-manager';
  * bootstrapPlugin — 从 main.ts onload() 中提取的全部初始化逻辑。
  */
 export async function bootstrapPlugin(plugin: CauldronPlugin): Promise<void> {
-  // 1. VaultDataManager → 确保目录存在
-  plugin.vaultDataManager = new VaultDataManager(plugin.app, plugin.settings.dandaoFolder);
-  await plugin.vaultDataManager.ensureDirectories();
+  // 1. VaultDataManager → 初始化标签笔记查询
+  const tagQuery = new TagNoteQuery(plugin.app);
+  plugin.vaultDataManager = new VaultDataManager(plugin.app, plugin.settings, tagQuery, plugin);
 
   // 2. DomainTagManager → 初始化标签
   plugin.domainTagManager = new DomainTagManager(plugin.app, plugin.vaultDataManager);
@@ -59,6 +60,7 @@ export async function bootstrapPlugin(plugin: CauldronPlugin): Promise<void> {
   // 6. CycleManager
   plugin.cycleManager = new CycleManager(
     plugin.app,
+    plugin,
     plugin.vaultDataManager,
     plugin.domainTagManager,
     () => plugin.settings.sealTime,
@@ -112,19 +114,12 @@ export async function bootstrapPlugin(plugin: CauldronPlugin): Promise<void> {
     },
   });
   plugin.addCommand({
-    id: 'open-investment',
-    name: '打开投注系统',
-    callback: async () => {
-      await activateViewAndSwitchTab(plugin, 'investment');
-    },
-  });
-  plugin.addCommand({
     id: 'attempt-breakthrough',
     name: '尝试突破',
     callback: async () => {
-      const cultivationMgr = new CultivationManager(plugin.vaultDataManager, plugin.eventBus);
+      const cultivationMgr = new CultivationManager(plugin, plugin.eventBus);
       const state = await cultivationMgr.getState();
-      new BreakthroughModal(plugin.app, plugin.vaultDataManager, state).open();
+      new BreakthroughModal(plugin.app, plugin, state).open();
     },
   });
   plugin.addCommand({
@@ -154,8 +149,8 @@ export async function bootstrapPlugin(plugin: CauldronPlugin): Promise<void> {
     true,
   );
 
-  // 监听 dandao 目录下文件变更（用户手动编辑日志时刷新视图）
-  const debouncedDandaoRefresh = debounce(
+  // 监听日记目录下文件变更（用户手动编辑日志时刷新视图）
+  const debouncedDailyNoteRefresh = debounce(
     async () => {
       await refreshView(plugin);
     },
@@ -165,10 +160,10 @@ export async function bootstrapPlugin(plugin: CauldronPlugin): Promise<void> {
 
   plugin.registerEvent(plugin.app.vault.on('modify', (file) => {
     if (file instanceof TFile) {
-      const folder = plugin.settings.dandaoFolder.toLowerCase();
-      const path = file.path.toLowerCase();
-      if (path.startsWith(folder + '/') || path.startsWith(folder + '\\')) {
-        debouncedDandaoRefresh();
+      // 检查是否是日记文件（YYYY-MM-DD.md 格式）
+      const isDailyNote = /^\d{4}-\d{2}-\d{2}\.md$/.test(file.name);
+      if (isDailyNote) {
+        debouncedDailyNoteRefresh();
       } else {
         debouncedFileHandler(file);
       }
@@ -218,6 +213,7 @@ async function refreshView(plugin: CauldronPlugin): Promise<void> {
   const leaves = plugin.app.workspace.getLeavesOfType(CAULDRON_VIEW_TYPE);
   for (const leaf of leaves) {
     const view = leaf.view as CauldronView;
+    view.plugin = plugin;
     view.vaultDataManager = plugin.vaultDataManager;
     view.pomodoroTimer = plugin.pomodoroTimer;
     view.domainTagManager = plugin.domainTagManager;

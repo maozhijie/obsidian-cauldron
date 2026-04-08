@@ -1,7 +1,6 @@
 import type { ViewSection, SectionContext } from './section-base';
 import type { FurnaceState } from '../../types';
 import { FurnaceManager } from '../../core/furnace-manager';
-import { VaultDataManager } from '../../core/vault/vault-data-manager';
 
 /** 丹炉等级称号 */
 const FURNACE_TITLES: Record<number, string> = {
@@ -28,8 +27,12 @@ export class FurnaceSection implements ViewSection {
 		}
 
 		try {
-			const vdm = ctx.vaultDataManager as VaultDataManager;
-			const furnaceManager = new FurnaceManager(vdm);
+			const plugin = ctx.plugin;
+			if (!plugin) {
+				section.createDiv({ text: '插件未初始化', cls: 'dandao-empty' });
+				return;
+			}
+			const furnaceManager = new FurnaceManager(plugin);
 			const state = await furnaceManager.getState();
 
 			this.renderFurnaceInfo(section, state, furnaceManager);

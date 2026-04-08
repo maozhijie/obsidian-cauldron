@@ -1,5 +1,5 @@
 import type {
-  HerbRecord, CatalystRecord, PillRecord, InvestmentRecord,
+  HerbRecord, CatalystRecord, PillRecord,
   Seed, CultivationState, CultivationRealm, FurnaceState,
 } from '../types';
 
@@ -9,7 +9,6 @@ export type CauldronEvents = {
   'catalyst-collected': { dateKey: string; catalyst: CatalystRecord };
   'pill-refined': { dateKey: string; pill: PillRecord };
   'day-sealed': { dateKey: string };
-  'investment-made': { record: InvestmentRecord };
   'seed-created': { seed: Seed };
   'seed-converted': { seed: Seed; taskPath: string };
   'cultivation-changed': { state: CultivationState };

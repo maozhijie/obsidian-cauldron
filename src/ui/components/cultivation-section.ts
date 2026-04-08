@@ -32,9 +32,14 @@ export class CultivationSection implements ViewSection {
 
 		try {
 			const eventBus = new EventBus();
-			const cultivationMgr = new CultivationManager(vaultDataManager, eventBus);
-			const meridianMgr = new MeridianManager(vaultDataManager);
-			const breakthroughEngine = new BreakthroughEngine(vaultDataManager, eventBus);
+			const plugin = ctx.plugin;
+			if (!plugin) {
+				container.createDiv({ cls: 'dandao-empty' }).setText('插件尚未初始化');
+				return;
+			}
+			const cultivationMgr = new CultivationManager(plugin, eventBus);
+			const meridianMgr = new MeridianManager(plugin);
+			const breakthroughEngine = new BreakthroughEngine(plugin, eventBus);
 
 			const state = await cultivationMgr.getState();
 			const meridians = await meridianMgr.getAllStates();
@@ -202,12 +207,12 @@ export class CultivationSection implements ViewSection {
 			btn.addClass('disabled');
 		}
 		btn.addEventListener('click', async () => {
-			if (!allMet || !ctx.vaultDataManager) return;
+			if (!allMet || !ctx.plugin) return;
 			// 动态导入 breakthrough modal 避免循环依赖
 			const { BreakthroughModal } = await import('../modals/breakthrough-modal');
 			const modal = new BreakthroughModal(
 				(window as any).app,
-				ctx.vaultDataManager,
+				ctx.plugin,
 				state,
 			);
 			modal.open();

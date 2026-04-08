@@ -1,6 +1,6 @@
 import type { FurnaceState, Grade } from '../types';
 import { FURNACE_LEVEL_TABLE } from '../constants';
-import { VaultDataManager } from './vault/vault-data-manager';
+import type CauldronPlugin from '../main';
 
 // 品级对应的经验加成
 const GRADE_XP_BONUS: Record<Grade, number> = {
@@ -15,11 +15,24 @@ const GRADE_XP_BONUS: Record<Grade, number> = {
  * 通过炼丹获得经验，提升丹炉等级，解锁品级加成、纯度保底和丹纹概率。
  */
 export class FurnaceManager {
-	constructor(private vaultDataManager: VaultDataManager) {}
+	private plugin: CauldronPlugin;
+
+	constructor(plugin: CauldronPlugin) {
+		this.plugin = plugin;
+	}
 
 	/** 获取当前丹炉状态 */
 	async getState(): Promise<FurnaceState> {
-		return this.vaultDataManager.getFurnaceState();
+		return this.plugin.data.furnaceState ?? this.getDefaultState();
+	}
+
+	private getDefaultState(): FurnaceState {
+		return {
+			level: 1,
+			xp: 0,
+			xpToNextLevel: 50,
+			totalPillsRefined: 0,
+		};
 	}
 
 	/**
@@ -27,7 +40,7 @@ export class FurnaceManager {
 	 * XP = herbCount + gradeBonus
 	 */
 	async addXp(herbCount: number, grade: Grade): Promise<FurnaceState> {
-		const state = await this.vaultDataManager.getFurnaceState();
+		const state = await this.getState();
 
 		const xpGain = herbCount + GRADE_XP_BONUS[grade];
 		state.xp += xpGain;
@@ -40,7 +53,8 @@ export class FurnaceManager {
 		const nextEntry = FURNACE_LEVEL_TABLE.find(e => e.level === state.level + 1);
 		state.xpToNextLevel = nextEntry ? nextEntry.xpRequired : state.xp; // 满级时设为当前XP
 
-		await this.vaultDataManager.saveFurnaceState(state);
+		this.plugin.data.furnaceState = state;
+		await this.plugin.savePluginData();
 		return state;
 	}
 

@@ -45,8 +45,6 @@ export interface PillRecord {
   药材总量: number;                // 药材份数总和
   已查看: boolean;
   丹纹?: PillPattern;              // 丹纹
-  投注状态?: 'unused' | 'invested'; // 投注状态
-  投注目标?: string;                // 投注目标
 }
 
 // ============ 每日日志 frontmatter ============
@@ -85,45 +83,13 @@ export interface PomodoroState {
   startedAt?: string;              // 开始时间 ISO
 }
 
-// ============ M4: 投注系统 ============
+// ============ M4: 项目系统 ============
 export interface Project {
   id: string;
   name: string;
   description: string;
   isActive: boolean;
   createdDate: string;
-  boosts: ProjectBoost[];
-}
-
-export interface ProjectBoost {
-  pillName: string;
-  investDate: string;
-  expiryDate: string;
-  effect: string;
-}
-
-export interface TaskTemplate {
-  id: string;
-  name: string;
-  description: string;
-  investmentLevel: number;
-  totalInvestments: number;
-}
-
-export interface Character {
-  id: string;
-  name: string;
-  xp: number;
-  level: number;
-}
-
-export interface InvestmentRecord {
-  id: string;
-  type: 'project' | 'template' | 'character';
-  targetId: string;
-  targetName: string;
-  pillRecord: PillRecord;
-  investDate: string;
 }
 
 // ============ M5: 播种层 ============

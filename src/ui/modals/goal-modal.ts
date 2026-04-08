@@ -82,14 +82,15 @@ export class GoalModal extends Modal {
 			if (!this.goalName || this.targetValue <= 0 || !this.unit) return;
 			try {
 				if (isEdit && this.editGoal) {
-					const updated: Goal = {
-						...this.editGoal,
-						name: this.goalName,
-						targetValue: this.targetValue,
-						unit: this.unit,
-						projectId: this.projectId || undefined,
-					};
-					await this.goalManager['vaultDataManager'].saveGoal(updated);
+					const goals = await this.goalManager.getAllGoals();
+					const goal = goals.find(g => g.id === this.editGoal!.id);
+					if (goal && 'file' in goal) {
+						const file = (goal as unknown as { file: import('obsidian').TFile }).file;
+						await this.goalManager['vaultDataManager'].updateGoal(file, {
+							targetValue: this.targetValue,
+							unit: this.unit,
+						});
+					}
 				} else {
 					await this.goalManager.createGoal(
 						this.goalName,

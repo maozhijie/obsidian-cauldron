@@ -11,11 +11,24 @@ export interface CauldronSettings {
   pomodoroBreakMinutes: number;    // 番茄钟休息时长
   showAnimation: boolean;          // 是否播放开炉动画
   showSound: boolean;              // 是否播放开炉音效
-  dandaoFolder: string;            // 数据目录名（默认 dandao）
   seedReminderDays: number;        // 种子过期提醒天数
   agingExpiryDays: number;         // 药材默认有效期天数
   breakthroughDifficulty: 'easy' | 'normal' | 'hard';  // 突破难度
   defaultStatsPeriod: string;      // 默认统计周期
+
+  // 标签配置
+  domainTag: string;      // 领域标签
+  seedTag: string;        // 种子标签
+  projectTag: string;     // 项目标签
+  goalTag: string;        // 目标标签
+  excludeTag: string;     // 排除/归档标签
+
+  // 笔记创建位置
+  projectFolder: string;  // 项目笔记存放文件夹
+  seedFolder: string;     // 种子笔记存放文件夹
+
+  // 日记集成
+  useDailyNotes: boolean; // 是否使用日记集成
 }
 
 // ============ 运行时状态（存储在 data.json 的 runtime 字段） ============
@@ -29,6 +42,14 @@ export interface RuntimeState {
 export interface PluginData {
   settings: CauldronSettings;
   runtime: RuntimeState;
+
+  // 修炼状态（原存储在 dandao/修炼档案.md，现移到 data.json）
+  cultivationState?: import('./types').CultivationState;
+  furnaceState?: import('./types').FurnaceState;
+  meridianStates?: import('./types').MeridianState[];
+
+  // 多周期丹炉数据
+  multiCycleFurnaces?: import('./types').MultiCycleFurnace[];
 }
 
 // ============ 默认值 ============
@@ -38,11 +59,24 @@ export const DEFAULT_SETTINGS: CauldronSettings = {
   pomodoroBreakMinutes: 5,
   showAnimation: true,
   showSound: false,
-  dandaoFolder: 'dandao',
   seedReminderDays: 7,
   agingExpiryDays: 7,
   breakthroughDifficulty: 'normal',
   defaultStatsPeriod: 'week',
+
+  // 标签配置
+  domainTag: 'cauldron/domain',
+  seedTag: 'cauldron/seed',
+  projectTag: 'cauldron/project',
+  goalTag: 'cauldron/goal',
+  excludeTag: 'cauldron/archive',
+
+  // 笔记创建位置
+  projectFolder: '',
+  seedFolder: '',
+
+  // 日记集成
+  useDailyNotes: true,
 };
 
 export const DEFAULT_RUNTIME: RuntimeState = {
@@ -139,7 +173,8 @@ export class CauldronSettingTab extends PluginSettingTab {
       .addButton(button => button
         .setButtonText('打开配置文件')
         .onClick(async () => {
-          const path = this.plugin.settings.dandaoFolder + '/领域配置.md';
+          // TODO: 后续需要改为基于标签搜索领域笔记
+          const path = '领域配置.md';
           const file = this.app.vault.getAbstractFileByPath(path);
           if (file) {
             await this.app.workspace.getLeaf().openFile(file as TFile);
@@ -159,17 +194,93 @@ export class CauldronSettingTab extends PluginSettingTab {
           }).open();
         }));
 
-    // ======== 3. 数据目录 ========
-    containerEl.createEl('h3', { text: '数据目录' });
+    // ======== 3. 标签与存储 ========
+    containerEl.createEl('h3', { text: '标签与存储' });
 
     new Setting(containerEl)
-      .setName('数据存储路径')
-      .setDesc('修炼数据存储的 Vault 目录名称（修改后需重启插件）')
+      .setName('领域标签')
+      .setDesc('用于标识领域笔记的标签名称')
       .addText(text => text
-        .setPlaceholder('dandao')
-        .setValue(this.plugin.settings.dandaoFolder)
+        .setPlaceholder('cauldron/domain')
+        .setValue(this.plugin.settings.domainTag)
         .onChange(async (value) => {
-          this.plugin.settings.dandaoFolder = value;
+          this.plugin.settings.domainTag = value;
+          await this.plugin.savePluginData();
+        }));
+
+    new Setting(containerEl)
+      .setName('种子标签')
+      .setDesc('用于标识种子笔记的标签名称')
+      .addText(text => text
+        .setPlaceholder('cauldron/seed')
+        .setValue(this.plugin.settings.seedTag)
+        .onChange(async (value) => {
+          this.plugin.settings.seedTag = value;
+          await this.plugin.savePluginData();
+        }));
+
+    new Setting(containerEl)
+      .setName('项目标签')
+      .setDesc('用于标识项目笔记的标签名称')
+      .addText(text => text
+        .setPlaceholder('cauldron/project')
+        .setValue(this.plugin.settings.projectTag)
+        .onChange(async (value) => {
+          this.plugin.settings.projectTag = value;
+          await this.plugin.savePluginData();
+        }));
+
+    new Setting(containerEl)
+      .setName('目标标签')
+      .setDesc('用于标识目标笔记的标签名称')
+      .addText(text => text
+        .setPlaceholder('cauldron/goal')
+        .setValue(this.plugin.settings.goalTag)
+        .onChange(async (value) => {
+          this.plugin.settings.goalTag = value;
+          await this.plugin.savePluginData();
+        }));
+
+    new Setting(containerEl)
+      .setName('归档标签')
+      .setDesc('用于标识已归档/排除笔记的标签名称')
+      .addText(text => text
+        .setPlaceholder('cauldron/archive')
+        .setValue(this.plugin.settings.excludeTag)
+        .onChange(async (value) => {
+          this.plugin.settings.excludeTag = value;
+          await this.plugin.savePluginData();
+        }));
+
+    new Setting(containerEl)
+      .setName('项目笔记文件夹')
+      .setDesc('创建项目笔记时存放的文件夹路径（留空表示 Vault 根目录）')
+      .addText(text => text
+        .setPlaceholder('Projects')
+        .setValue(this.plugin.settings.projectFolder)
+        .onChange(async (value) => {
+          this.plugin.settings.projectFolder = value;
+          await this.plugin.savePluginData();
+        }));
+
+    new Setting(containerEl)
+      .setName('种子笔记文件夹')
+      .setDesc('创建种子笔记时存放的文件夹路径（留空表示 Vault 根目录）')
+      .addText(text => text
+        .setPlaceholder('Seeds')
+        .setValue(this.plugin.settings.seedFolder)
+        .onChange(async (value) => {
+          this.plugin.settings.seedFolder = value;
+          await this.plugin.savePluginData();
+        }));
+
+    new Setting(containerEl)
+      .setName('使用日记集成')
+      .setDesc('是否将药材和丹药记录保存到日记中（需要 Daily Notes 插件或核心日记插件）')
+      .addToggle(toggle => toggle
+        .setValue(this.plugin.settings.useDailyNotes)
+        .onChange(async (value) => {
+          this.plugin.settings.useDailyNotes = value;
           await this.plugin.savePluginData();
         }));
 

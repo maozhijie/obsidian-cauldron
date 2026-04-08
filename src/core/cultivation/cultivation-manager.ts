@@ -1,5 +1,5 @@
 import type { CultivationState, CultivationRealm, PillRecord, Grade } from '../../types';
-import { VaultDataManager } from '../vault/vault-data-manager';
+import type CauldronPlugin from '../../main';
 import { EventBus } from '../event-bus';
 import { REALM_THRESHOLDS, REALM_UNLOCKS } from '../../constants';
 
@@ -23,14 +23,17 @@ const SEAL_GRADE_BONUS: Record<Grade, number> = {
 const REALM_ORDER: CultivationRealm[] = ['练气', '筑基', '金丹', '元婴', '化神'];
 
 export class CultivationManager {
-	constructor(
-		private vaultDataManager: VaultDataManager,
-		private eventBus: EventBus,
-	) {}
+	private plugin: CauldronPlugin;
+	private eventBus: EventBus;
+
+	constructor(plugin: CauldronPlugin, eventBus: EventBus) {
+		this.plugin = plugin;
+		this.eventBus = eventBus;
+	}
 
 	/** 获取当前修炼状态 */
 	async getState(): Promise<CultivationState> {
-		return this.vaultDataManager.getCultivationState();
+		return this.plugin.data.cultivationState ?? this.getDefaultState();
 	}
 
 	/** 获取默认初始状态 */
@@ -66,7 +69,8 @@ export class CultivationManager {
 			}
 		}
 
-		await this.vaultDataManager.saveCultivationState(state);
+		this.plugin.data.cultivationState = state;
+		await this.plugin.savePluginData();
 		this.eventBus.emit('cultivation-changed', { state });
 		return state;
 	}

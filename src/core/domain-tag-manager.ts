@@ -1,7 +1,7 @@
 import type { App } from 'obsidian';
 import type { DomainTag, Flavor } from '../types';
 import { DEFAULT_DOMAIN_TAGS } from '../constants';
-import { VaultDataManager } from './vault-data-manager';
+import { VaultDataManager } from './vault/vault-data-manager';
 
 /**
  * DomainTagManager — 领域标签的增删改查逻辑。
@@ -70,6 +70,10 @@ export class DomainTagManager {
 			throw new Error(`领域标签 "${newTag.name}" 已存在`);
 		}
 		this.tags[idx] = newTag;
+		// 如果重命名，删除旧笔记
+		if (newTag.name !== oldName) {
+			await this.vaultDataManager.removeDomainTag(oldName);
+		}
 		await this.save();
 	}
 
@@ -80,7 +84,7 @@ export class DomainTagManager {
 			throw new Error(`未找到领域标签 "${name}"`);
 		}
 		this.tags.splice(idx, 1);
-		await this.save();
+		await this.vaultDataManager.removeDomainTag(name);
 	}
 
 	/** 从任务的标签列表中匹配第一个已注册的领域标签 */
@@ -94,6 +98,8 @@ export class DomainTagManager {
 
 	/** 将当前 tags 写入 Vault */
 	private async save(): Promise<void> {
-		await this.vaultDataManager.saveDomainTags(this.tags);
+		for (const tag of this.tags) {
+			await this.vaultDataManager.saveDomainTag(tag);
+		}
 	}
 }

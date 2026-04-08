@@ -62,7 +62,8 @@ export class StatsSection implements ViewSection {
 		try {
 			const snapshot = await generateSnapshot(vdm, this.currentPeriod);
 			const domainTags = await vdm.getDomainTags();
-			const meridians = await vdm.getMeridianStates();
+			// 经脉状态从 plugin.data 获取（通过 ctx.plugin）
+			const meridians = ctx.plugin?.data?.meridianStates ?? [];
 			const domainStats = await getDomainStatsData(vdm, domainTags, meridians);
 
 			this.renderOverviewCards(container, snapshot);

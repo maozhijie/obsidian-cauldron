@@ -2,7 +2,7 @@ import { App, Modal } from 'obsidian';
 import type { CultivationState, CultivationRealm, BreakthroughCondition } from '../../types';
 import { BreakthroughEngine } from '../../core/cultivation/breakthrough-engine';
 import { EventBus } from '../../core/event-bus';
-import type { VaultDataManager } from '../../core/vault/vault-data-manager';
+import type CauldronPlugin from '../../main';
 
 /** 境界主题色 */
 const REALM_COLORS: Record<CultivationRealm, string> = {
@@ -21,12 +21,12 @@ const REALM_ORDER: CultivationRealm[] = ['练气', '筑基', '金丹', '元婴',
  * 显示条件检查、尝试突破、展示成功/失败结果。
  */
 export class BreakthroughModal extends Modal {
-	private vaultDataManager: VaultDataManager;
+	private plugin: CauldronPlugin;
 	private state: CultivationState;
 
-	constructor(app: App, vaultDataManager: VaultDataManager, state: CultivationState) {
+	constructor(app: App, plugin: CauldronPlugin, state: CultivationState) {
 		super(app);
-		this.vaultDataManager = vaultDataManager;
+		this.plugin = plugin;
 		this.state = state;
 	}
 
@@ -34,7 +34,7 @@ export class BreakthroughModal extends Modal {
 		const { contentEl } = this;
 		const state = this.state;
 		const eventBus = new EventBus();
-		const engine = new BreakthroughEngine(this.vaultDataManager, eventBus);
+		const engine = new BreakthroughEngine(this.plugin, eventBus);
 
 		const container = contentEl.createDiv({ cls: 'bt-container' });
 
@@ -55,7 +55,7 @@ export class BreakthroughModal extends Modal {
 		// 中部：条件列表
 		let conditions: BreakthroughCondition[] = [];
 		try {
-			const meridians = await this.vaultDataManager.getMeridianStates();
+			const meridians = this.plugin.data.meridianStates ?? [];
 			conditions = await engine.getConditions(state, meridians);
 		} catch {
 			container.createDiv({ cls: 'dandao-empty' }).setText('条件加载失败');

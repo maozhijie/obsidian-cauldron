@@ -1,6 +1,6 @@
 import type { CultivationState, CultivationRealm, BreakthroughCondition, MeridianState, Grade } from '../../types';
 import { BREAKTHROUGH_CONDITIONS, REALM_UNLOCKS, REALM_THRESHOLDS } from '../../constants';
-import { VaultDataManager } from '../vault/vault-data-manager';
+import type CauldronPlugin from '../../main';
 import { EventBus } from '../event-bus';
 
 /** 境界顺序 */
@@ -42,10 +42,13 @@ function parseRequiredMeridianLevel(description: string): number {
 }
 
 export class BreakthroughEngine {
-	constructor(
-		private vaultDataManager: VaultDataManager,
-		private eventBus: EventBus,
-	) {}
+	private plugin: CauldronPlugin;
+	private eventBus: EventBus;
+
+	constructor(plugin: CauldronPlugin, eventBus: EventBus) {
+		this.plugin = plugin;
+		this.eventBus = eventBus;
+	}
 
 	/** 获取当前境界的突破条件及完成状态 */
 	async getConditions(state: CultivationState, meridians: MeridianState[]): Promise<BreakthroughCondition[]> {
@@ -73,7 +76,7 @@ export class BreakthroughEngine {
 					break;
 				}
 				case 'furnace_level': {
-					const furnace = await this.vaultDataManager.getFurnaceState();
+					const furnace = this.plugin.data.furnaceState ?? { level: 1, xp: 0, xpToNextLevel: 50, totalPillsRefined: 0 };
 					current = furnace.level;
 					break;
 				}
@@ -103,7 +106,7 @@ export class BreakthroughEngine {
 		newState: CultivationState;
 		message: string;
 	}> {
-		const meridians = await this.vaultDataManager.getMeridianStates();
+		const meridians = this.plugin.data.meridianStates ?? [];
 		const allMet = await this.areAllConditionsMet(state, meridians);
 
 		if (!allMet) {
@@ -140,7 +143,8 @@ export class BreakthroughEngine {
 			const features = this.getAllUnlockedFeatures(nextRealm);
 			state.unlockedFeatures = features;
 
-			await this.vaultDataManager.saveCultivationState(state);
+			this.plugin.data.cultivationState = state;
+			await this.plugin.savePluginData();
 			this.eventBus.emit('breakthrough-attempt', { success: true, realm: nextRealm });
 
 			return {
@@ -153,7 +157,8 @@ export class BreakthroughEngine {
 			state.heartStateValue += 5;
 			state.breakthroughAttempts += 1;
 
-			await this.vaultDataManager.saveCultivationState(state);
+			this.plugin.data.cultivationState = state;
+			await this.plugin.savePluginData();
 			this.eventBus.emit('breakthrough-attempt', { success: false, realm: state.realm });
 
 			return {
@@ -177,7 +182,7 @@ export class BreakthroughEngine {
 			const date = new Date(today);
 			date.setDate(today.getDate() - i);
 			const dateKey = this.formatDate(date);
-			const log = await this.vaultDataManager.getDailyLog(dateKey);
+			const log = await this.plugin.vaultDataManager.getDailyLog(dateKey);
 
 			if (log && log.封炉状态 === '已封炉') {
 				streak++;
@@ -191,7 +196,7 @@ export class BreakthroughEngine {
 
 	/** 统计总丹药数 */
 	private async calculateTotalPills(): Promise<number> {
-		const pills = await this.vaultDataManager.getAllPills();
+		const pills = await this.plugin.vaultDataManager.getAllPills();
 		return pills.length;
 	}
 
@@ -199,10 +204,10 @@ export class BreakthroughEngine {
 	private async checkPillGrade(realm: CultivationRealm): Promise<number> {
 		const requiredGrade = getRequiredGradeForRealm(realm);
 		const requiredRank = GRADE_RANK[requiredGrade];
-		const pills = await this.vaultDataManager.getAllPills();
+		const pills = await this.plugin.vaultDataManager.getAllPills();
 
 		for (const { pill } of pills) {
-			const rank = GRADE_RANK[pill.品级] ?? 0;
+			const rank = GRADE_RANK[pill.品级 as Grade] ?? 0;
 			if (rank >= requiredRank) return 1;
 		}
 		return 0;

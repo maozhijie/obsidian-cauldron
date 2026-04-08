@@ -1,7 +1,7 @@
 import { App, Modal } from 'obsidian';
 import type { PillRecord, DailyLogFrontmatter, PillPattern, Flavor } from '../types';
 import { GRADE_COLORS, FLAVOR_ICONS } from '../constants';
-import type { VaultDataManager } from '../core/vault-data-manager';
+import type { VaultDataManager } from '../core/vault/vault-data-manager';
 import { analyzeCompatibility, type CompatibilityResult } from '../core/compatibility-engine';
 
 /**

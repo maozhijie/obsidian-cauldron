@@ -6,10 +6,11 @@ import {
   type RuntimeState,
   type PluginData,
 } from './settings';
+import type { CultivationState, FurnaceState, MeridianState, MultiCycleFurnace } from './types';
 import { CAULDRON_VIEW_TYPE } from './constants';
 import { EventBus } from './core/event-bus';
 import { bootstrapPlugin, teardownPlugin } from './core/plugin-bootstrap';
-import type { VaultDataManager } from './core/vault-data-manager';
+import type { VaultDataManager } from './core/vault/vault-data-manager';
 import type { DomainTagManager } from './core/domain-tag-manager';
 import type { CatalystCollector } from './core/catalyst-collector';
 import type { HerbCollector } from './core/herb-collector';
@@ -20,6 +21,12 @@ import type { CauldronView } from './ui/cauldron-view';
 export default class CauldronPlugin extends Plugin {
   settings: CauldronSettings = DEFAULT_SETTINGS;
   runtime: RuntimeState = DEFAULT_RUNTIME;
+  data: {
+    cultivationState?: CultivationState;
+    furnaceState?: FurnaceState;
+    meridianStates?: MeridianState[];
+    multiCycleFurnaces?: MultiCycleFurnace[];
+  } = {};
   eventBus!: EventBus;
 
   // 核心管理器（由 bootstrapPlugin 初始化）
@@ -56,12 +63,22 @@ export default class CauldronPlugin extends Plugin {
     const data = (await this.loadData()) as PluginData | null;
     this.settings = Object.assign({}, DEFAULT_SETTINGS, data?.settings);
     this.runtime = Object.assign({}, DEFAULT_RUNTIME, data?.runtime);
+    this.data = {
+      cultivationState: data?.cultivationState,
+      furnaceState: data?.furnaceState,
+      meridianStates: data?.meridianStates,
+      multiCycleFurnaces: data?.multiCycleFurnaces,
+    };
   }
 
   async savePluginData() {
     const data: PluginData = {
       settings: this.settings,
       runtime: this.runtime,
+      cultivationState: this.data.cultivationState,
+      furnaceState: this.data.furnaceState,
+      meridianStates: this.data.meridianStates,
+      multiCycleFurnaces: this.data.multiCycleFurnaces,
     };
     await this.saveData(data);
   }
