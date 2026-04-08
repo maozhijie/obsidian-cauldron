@@ -1,11 +1,9 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"id": "dandao-cultivation",
+	"name": "丹道修炼系统",
+	"version": "0.1.0",
+	"minAppVersion": "1.0.0",
+	"description": "将生产力行为游戏化的丹道修炼系统。完成任务采集药材，番茄钟积累药引，每日封炉炼丹。",
+	"author": "DanDao",
 	"isDesktopOnly": false
 }

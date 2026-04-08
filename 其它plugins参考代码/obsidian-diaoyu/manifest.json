@@ -1,0 +1,9 @@
+{
+  "id": "diaoyu",
+  "name": "Diaoyu",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "间隔重复学习插件，基于FSRS算法的渐进式笔记复习系统",
+  "author": "Diaoyu",
+  "isDesktopOnly": false
+}

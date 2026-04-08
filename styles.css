@@ -1,8 +1,740 @@
 /*
+ * 丹道修炼系统 — 东方美学风格 CSS
+ * 主色调：墨色、宣纸白、朱砂红、石青色
+ */
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+/* ========================================
+   CSS 变量 / 设计令牌
+   ======================================== */
 
-If your plugin does not need CSS, delete this file.
+:root {
+  --dandao-cinnabar: #c0392b;        /* 朱砂红 */
+  --dandao-ink: #2c2c2c;             /* 墨色 */
+  --dandao-paper: #f5f0e8;           /* 宣纸白 */
+  --dandao-stone-blue: #2196F3;      /* 石青 */
+  --dandao-border: rgba(0, 0, 0, 0.08);
+  --dandao-radius: 6px;
+  --dandao-section-gap: 16px;
 
-*/
+  /* 品级颜色 */
+  --dandao-grade-common: #9e9e9e;
+  --dandao-grade-spirit: #2196F3;
+  --dandao-grade-treasure: #9C27B0;
+  --dandao-grade-divine: #FF9800;
+
+  /* 性味颜色 */
+  --dandao-flavor-mind: #42A5F5;
+  --dandao-flavor-bone: #8D6E63;
+  --dandao-flavor-agile: #66BB6A;
+  --dandao-flavor-fusion: #FFA726;
+}
+
+/* 暗色模式微调 */
+.theme-dark {
+  --dandao-cinnabar: #e74c3c;
+  --dandao-ink: #e0dcd4;
+  --dandao-paper: rgba(255, 255, 255, 0.04);
+  --dandao-border: rgba(255, 255, 255, 0.08);
+}
+
+/* ========================================
+   动画关键帧
+   ======================================== */
+
+@keyframes dandao-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dandao-pulse-glow {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
+/* ========================================
+   侧边栏视图 — 主容器
+   ======================================== */
+
+.dandao-container {
+  padding: 12px 14px 24px;
+  max-width: 420px;
+  margin: 0 auto;
+  animation: dandao-fade-in 0.3s ease;
+}
+
+/* ---- 头部 ---- */
+
+.dandao-header {
+  text-align: center;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--dandao-border);
+  position: relative;
+}
+
+.dandao-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: var(--dandao-cinnabar);
+  border-radius: 1px;
+}
+
+.dandao-header h4 {
+  margin: 0 0 4px;
+  font-size: 1.15em;
+  font-weight: 600;
+  color: var(--text-normal);
+  letter-spacing: 2px;
+}
+
+.dandao-subtitle {
+  font-size: 0.78em;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+/* ---- 状态栏 ---- */
+
+.dandao-status-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: var(--dandao-section-gap);
+  background: var(--dandao-paper);
+  border-radius: var(--dandao-radius);
+  padding: 10px 8px;
+  border: 1px solid var(--dandao-border);
+}
+
+.dandao-status-bar .status-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dandao-status-bar .status-label {
+  font-size: 0.7em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.dandao-status-bar .status-value {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--text-normal);
+  white-space: nowrap;
+}
+
+/* ---- 区块通用 ---- */
+
+.dandao-section {
+  margin-bottom: var(--dandao-section-gap);
+  animation: dandao-fade-in 0.35s ease both;
+}
+
+.dandao-section:nth-child(3) { animation-delay: 0.04s; }
+.dandao-section:nth-child(4) { animation-delay: 0.08s; }
+.dandao-section:nth-child(5) { animation-delay: 0.12s; }
+.dandao-section:nth-child(6) { animation-delay: 0.16s; }
+
+.dandao-section h5 {
+  font-size: 0.88em;
+  font-weight: 600;
+  color: var(--text-normal);
+  margin: 0 0 8px;
+  padding-left: 10px;
+  position: relative;
+  letter-spacing: 0.5px;
+}
+
+.dandao-section h5::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--dandao-cinnabar);
+}
+
+/* ---- 药篓区 ---- */
+
+.herb-empty,
+.catalyst-empty,
+.pill-empty {
+  font-size: 0.8em;
+  color: var(--text-faint);
+  text-align: center;
+  padding: 16px 8px;
+  font-style: italic;
+}
+
+.herb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.herb-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: var(--dandao-radius);
+  background: var(--background-secondary);
+  transition: background 0.15s ease;
+}
+
+.herb-item:hover {
+  background: var(--background-secondary-alt);
+}
+
+.herb-icon {
+  font-size: 1em;
+  flex-shrink: 0;
+}
+
+.herb-domain {
+  font-size: 0.82em;
+  font-weight: 500;
+  color: var(--text-normal);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.herb-flavor {
+  font-size: 0.75em;
+  flex-shrink: 0;
+}
+
+.herb-quantity {
+  font-size: 0.78em;
+  font-weight: 600;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  min-width: 24px;
+  text-align: right;
+}
+
+/* ---- 引囊区 ---- */
+
+.catalyst-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.catalyst-item {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.catalyst-item:hover {
+  background: var(--background-secondary-alt);
+}
+
+/* ---- 番茄钟 ---- */
+
+.dandao-pomodoro .pomodoro-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 8px 10px;
+  border-radius: var(--dandao-radius);
+  background: var(--dandao-paper);
+  border: 1px solid var(--dandao-border);
+  margin-bottom: 8px;
+}
+
+.pomodoro-time {
+  font-size: 2.2em;
+  font-weight: 700;
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+  letter-spacing: 2px;
+  color: var(--text-normal);
+  line-height: 1.2;
+}
+
+.pomodoro-status {
+  font-size: 0.78em;
+  margin-top: 4px;
+  padding: 2px 10px;
+  border-radius: 10px;
+  color: var(--text-muted);
+  background: var(--background-secondary);
+}
+
+/* 番茄钟状态色 */
+.dandao-pomodoro[data-mode="running"] .pomodoro-time,
+.dandao-pomodoro .pomodoro-status:empty ~ .pomodoro-time {
+  color: var(--dandao-cinnabar);
+}
+
+.pomodoro-break-info {
+  font-size: 0.82em;
+  padding: 4px 0;
+}
+
+.pomodoro-controls {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pomodoro-controls button {
+  font-size: 0.82em;
+  padding: 5px 18px;
+  border-radius: var(--dandao-radius);
+  border: 1px solid var(--dandao-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 500;
+}
+
+.pomodoro-controls button:hover {
+  background: var(--dandao-cinnabar);
+  color: #fff;
+  border-color: var(--dandao-cinnabar);
+}
+
+.pomodoro-controls button:active {
+  transform: scale(0.97);
+}
+
+/* ---- 丹囊区（侧边栏） ---- */
+
+.pill-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border-radius: var(--dandao-radius);
+  background: var(--background-secondary);
+  border: 1px solid var(--dandao-border);
+  margin-bottom: 8px;
+}
+
+.dandao-pills .pill-name {
+  font-size: 0.88em;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.pill-meta {
+  font-size: 0.75em;
+  color: var(--text-muted);
+}
+
+.pill-list-btn {
+  display: block;
+  width: 100%;
+  font-size: 0.8em;
+  padding: 6px 12px;
+  border-radius: var(--dandao-radius);
+  border: 1px dashed var(--dandao-border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.pill-list-btn:hover {
+  border-color: var(--dandao-cinnabar);
+  color: var(--dandao-cinnabar);
+  background: rgba(192, 57, 43, 0.04);
+}
+
+/* ========================================
+   开炉模态框 — FurnaceModal
+   ======================================== */
+
+.furnace-container {
+  position: relative;
+  padding: 24px 20px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.furnace-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  animation: dandao-pulse-glow 3s ease-in-out infinite;
+  z-index: 0;
+}
+
+.furnace-pill-display {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 20px;
+}
+
+.pill-grade-badge {
+  display: inline-block;
+  font-size: 0.78em;
+  font-weight: 600;
+  padding: 3px 14px;
+  border-radius: 20px;
+  border: 1.5px solid;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.furnace-pill-display .pill-name {
+  margin: 0 0 8px;
+  font-size: 1.25em;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.pill-description {
+  font-size: 0.85em;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin: 0 auto;
+  max-width: 340px;
+}
+
+/* 关键数据 */
+
+.furnace-stats {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 14px 0;
+  border-top: 1px solid var(--dandao-border);
+  border-bottom: 1px solid var(--dandao-border);
+  margin-bottom: 16px;
+}
+
+.furnace-stats .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 0.72em;
+  color: var(--text-muted);
+}
+
+.stat-value {
+  font-size: 1em;
+  font-weight: 700;
+  color: var(--text-normal);
+}
+
+/* 炼丹材料详情 */
+
+.furnace-details {
+  position: relative;
+  z-index: 1;
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.furnace-details h4 {
+  font-size: 0.85em;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--text-normal);
+  padding-left: 10px;
+  position: relative;
+}
+
+.furnace-details h4::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--dandao-cinnabar);
+}
+
+.detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.detail-item {
+  font-size: 0.8em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  white-space: nowrap;
+}
+
+/* 操作区 */
+
+.furnace-actions {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding-top: 8px;
+}
+
+.furnace-close-btn {
+  font-size: 0.88em;
+  padding: 8px 32px;
+  border-radius: var(--dandao-radius);
+  border: 1px solid var(--dandao-cinnabar);
+  background: var(--dandao-cinnabar);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.furnace-close-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(192, 57, 43, 0.3);
+}
+
+.furnace-close-btn:active {
+  transform: translateY(0);
+}
+
+/* ========================================
+   丹药列表模态框 — PillListModal
+   ======================================== */
+
+.pill-list-title {
+  text-align: center;
+  font-size: 1.1em;
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--dandao-border);
+  position: relative;
+}
+
+.pill-list-title::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: var(--dandao-cinnabar);
+  border-radius: 1px;
+}
+
+.pill-list-empty {
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 0.85em;
+  padding: 24px 12px;
+  font-style: italic;
+}
+
+.pill-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.pill-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--dandao-radius);
+  background: var(--background-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pill-list-item:hover {
+  background: var(--background-secondary-alt);
+  transform: translateX(2px);
+}
+
+.pill-list-item .pill-date {
+  font-size: 0.72em;
+  color: var(--text-faint);
+  min-width: 72px;
+  flex-shrink: 0;
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+}
+
+.pill-list-item .pill-name {
+  flex: 1;
+  font-size: 0.82em;
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pill-list-item .pill-grade {
+  font-size: 0.72em;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: var(--background-primary);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.pill-list-item .pill-purity {
+  font-size: 0.75em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  min-width: 32px;
+  text-align: right;
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+}
+
+/* ========================================
+   领域标签模态框 — DomainTagModal
+   ======================================== */
+
+/* 使用 Obsidian 原生 Setting 组件，仅做微调 */
+.modal h3 {
+  letter-spacing: 1px;
+}
+
+/* ========================================
+   通用 / 工具类
+   ======================================== */
+
+/* 品级着色工具 — 可通过 JS 内联覆盖，也可用于纯 CSS 场景 */
+.dandao-grade-common  { color: var(--dandao-grade-common); }
+.dandao-grade-spirit  { color: var(--dandao-grade-spirit); }
+.dandao-grade-treasure { color: var(--dandao-grade-treasure); }
+.dandao-grade-divine  { color: var(--dandao-grade-divine); }
+
+/* 性味着色工具 */
+.dandao-flavor-mind   { color: var(--dandao-flavor-mind); }
+.dandao-flavor-bone   { color: var(--dandao-flavor-bone); }
+.dandao-flavor-agile  { color: var(--dandao-flavor-agile); }
+.dandao-flavor-fusion { color: var(--dandao-flavor-fusion); }
+
+/* 通用标签 */
+.dandao-tag {
+  display: inline-block;
+  font-size: 0.72em;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* 通用区块标题（带左装饰线） */
+.dandao-section-title {
+  font-size: 0.88em;
+  font-weight: 600;
+  color: var(--text-normal);
+  padding-left: 10px;
+  position: relative;
+  margin: 0 0 8px;
+}
+
+.dandao-section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--dandao-cinnabar);
+}
+
+/* 空状态提示 */
+.dandao-empty {
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 0.82em;
+  padding: 16px 8px;
+  font-style: italic;
+}
+
+/* 品级标记 */
+.dandao-grade {
+  font-size: 0.72em;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 10px;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+
+/* ========================================
+   响应式：窄面板适配
+   ======================================== */
+
+@media (max-width: 300px) {
+  .dandao-container {
+    padding: 8px 8px 16px;
+  }
+
+  .dandao-status-bar {
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+  }
+
+  .dandao-status-bar .status-item {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .pomodoro-time {
+    font-size: 1.6em;
+  }
+
+  .furnace-stats {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .pill-list-item {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .pill-list-item .pill-date {
+    width: 100%;
+  }
+}
+
+/* 侧边栏容器内的滚动 */
+.view-content:has(.dandao-container) {
+  overflow-y: auto;
+}
